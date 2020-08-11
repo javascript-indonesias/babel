@@ -34,13 +34,12 @@ export default class LValParser extends NodeUtils {
   // Forward-declaration: defined in expression.js
   /*::
   +parseIdentifier: (liberal?: boolean) => Identifier;
-  +parseMaybeAssign: (
-    noIn?: ?boolean,
+  +parseMaybeAssignAllowIn: (
     refExpressionErrors?: ?ExpressionErrors,
     afterLeftParse?: Function,
     refNeedsArrowPos?: ?Pos,
   ) => Expression;
-  +parseObj: <T: ObjectPattern | ObjectExpression>(
+  +parseObjectLike: <T: ObjectPattern | ObjectExpression>(
     close: TokenType,
     isPattern: boolean,
     isRecord?: ?boolean,
@@ -226,8 +225,7 @@ export default class LValParser extends NodeUtils {
   ): SpreadElement {
     const node = this.startNode();
     this.next();
-    node.argument = this.parseMaybeAssign(
-      false,
+    node.argument = this.parseMaybeAssignAllowIn(
       refExpressionErrors,
       undefined,
       refNeedsArrowPos,
@@ -340,7 +338,7 @@ export default class LValParser extends NodeUtils {
 
     const node = this.startNodeAt(startPos, startLoc);
     node.left = left;
-    node.right = this.parseMaybeAssign();
+    node.right = this.parseMaybeAssignAllowIn();
     return this.finishNode(node, "AssignmentPattern");
   }
 
@@ -366,7 +364,6 @@ export default class LValParser extends NodeUtils {
             ? isStrictBindReservedWord(expr.name, this.inModule)
             : isStrictBindOnlyReservedWord(expr.name))
         ) {
-          /* eslint-disable @babel/development-internal/dry-error-messages */
           this.raise(
             expr.start,
             bindingType === BIND_NONE
@@ -374,7 +371,6 @@ export default class LValParser extends NodeUtils {
               : Errors.StrictEvalArgumentsBinding,
             expr.name,
           );
-          /* eslint-enable @babel/development-internal/dry-error-messages */
         }
 
         if (checkClashes) {
@@ -471,7 +467,6 @@ export default class LValParser extends NodeUtils {
         break;
 
       default: {
-        /* eslint-disable @babel/development-internal/dry-error-messages */
         this.raise(
           expr.start,
           bindingType === BIND_NONE
@@ -479,7 +474,6 @@ export default class LValParser extends NodeUtils {
             : Errors.InvalidLhsBinding,
           contextDescription,
         );
-        /* eslint-enable @babel/development-internal/dry-error-messages */
       }
     }
   }

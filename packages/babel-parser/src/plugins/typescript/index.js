@@ -1285,7 +1285,7 @@ export default (superClass: Class<Parser>): Class<Parser> =>
         ? this.parseExprAtom()
         : this.parseIdentifier(/* liberal */ true);
       if (this.eat(tt.eq)) {
-        node.initializer = this.parseMaybeAssign();
+        node.initializer = this.parseMaybeAssignAllowIn();
       }
       return this.finishNode(node, "TSEnumMember");
     }
@@ -1865,7 +1865,6 @@ export default (superClass: Class<Parser>): Class<Parser> =>
       leftStartPos: number,
       leftStartLoc: Position,
       minPrec: number,
-      noIn: ?boolean,
     ) {
       if (
         nonNull(tt._in.binop) > minPrec &&
@@ -1884,16 +1883,12 @@ export default (superClass: Class<Parser>): Class<Parser> =>
           node.typeAnnotation = this.tsNextThenParseType();
         }
         this.finishNode(node, "TSAsExpression");
-        return this.parseExprOp(
-          node,
-          leftStartPos,
-          leftStartLoc,
-          minPrec,
-          noIn,
-        );
+        // rescan `<`, `>` because they were scanned when this.state.inType was true
+        this.reScan_lt_gt();
+        return this.parseExprOp(node, leftStartPos, leftStartLoc, minPrec);
       }
 
-      return super.parseExprOp(left, leftStartPos, leftStartLoc, minPrec, noIn);
+      return super.parseExprOp(left, leftStartPos, leftStartLoc, minPrec);
     }
 
     checkReservedWord(
@@ -2133,7 +2128,6 @@ export default (superClass: Class<Parser>): Class<Parser> =>
     // An apparent conditional expression could actually be an optional parameter in an arrow function.
     parseConditional(
       expr: N.Expression,
-      noIn: ?boolean,
       startPos: number,
       startLoc: Position,
       refNeedsArrowPos?: ?Pos,
@@ -2143,7 +2137,6 @@ export default (superClass: Class<Parser>): Class<Parser> =>
       if (!refNeedsArrowPos || !this.match(tt.question)) {
         return super.parseConditional(
           expr,
-          noIn,
           startPos,
           startLoc,
           refNeedsArrowPos,
@@ -2151,7 +2144,7 @@ export default (superClass: Class<Parser>): Class<Parser> =>
       }
 
       const result = this.tryParse(() =>
-        super.parseConditional(expr, noIn, startPos, startLoc),
+        super.parseConditional(expr, startPos, startLoc),
       );
 
       if (!result.node) {
@@ -2628,10 +2621,24 @@ export default (superClass: Class<Parser>): Class<Parser> =>
 
     // ensure that inside types, we bypass the jsx parser plugin
     getTokenFromCode(code: number): void {
-      if (this.state.inType && (code === 62 || code === 60)) {
+      if (
+        this.state.inType &&
+        (code === charCodes.greaterThan || code === charCodes.lessThan)
+      ) {
         return this.finishOp(tt.relational, 1);
       } else {
         return super.getTokenFromCode(code);
+      }
+    }
+
+    // used after we have finished parsing types
+    reScan_lt_gt() {
+      if (this.match(tt.relational)) {
+        const code = this.input.charCodeAt(this.state.start);
+        if (code === charCodes.lessThan || code === charCodes.greaterThan) {
+          this.state.pos -= 1;
+          this.readToken_lt_gt(code);
+        }
       }
     }
 
@@ -2720,12 +2727,13 @@ export default (superClass: Class<Parser>): Class<Parser> =>
       return hasContextParam ? baseCount + 1 : baseCount;
     }
 
-    parseCatchClauseParam(): N.Identifier {
+    parseCatchClauseParam(): N.Pattern {
       const param = super.parseCatchClauseParam();
       const type = this.tsTryParseTypeAnnotation();
 
       if (type) {
         param.typeAnnotation = type;
+        this.resetEndLocation(param);
       }
 
       return param;

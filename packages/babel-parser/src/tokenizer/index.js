@@ -420,14 +420,12 @@ export default class Tokenizer extends ParserErrors {
       // misleading
       this.expectPlugin("recordAndTuple");
       if (this.getPluginOption("recordAndTuple", "syntaxType") !== "hash") {
-        /* eslint-disable @babel/development-internal/dry-error-messages */
         throw this.raise(
           this.state.pos,
           next === charCodes.leftCurlyBrace
             ? Errors.RecordExpressionHashIncorrectStartSyntaxType
             : Errors.TupleExpressionHashIncorrectStartSyntaxType,
         );
-        /* eslint-enable @babel/development-internal/dry-error-messages */
       }
 
       if (next === charCodes.leftCurlyBrace) {
@@ -693,7 +691,7 @@ export default class Tokenizer extends ParserErrors {
     // '?'
     const next = this.input.charCodeAt(this.state.pos + 1);
     const next2 = this.input.charCodeAt(this.state.pos + 2);
-    if (next === charCodes.questionMark && !this.state.inType) {
+    if (next === charCodes.questionMark) {
       if (next2 === charCodes.equalsTo) {
         // '??='
         this.finishOp(tt.assign, 3);

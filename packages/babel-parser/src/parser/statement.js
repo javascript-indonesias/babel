@@ -639,7 +639,7 @@ export default class StatementParser extends ExpressionParser {
     return this.finishNode(node, "ThrowStatement");
   }
 
-  parseCatchClauseParam(): N.Identifier {
+  parseCatchClauseParam(): N.Pattern {
     const param = this.parseBindingAtom();
 
     const simple = param.type === "Identifier";
@@ -973,7 +973,9 @@ export default class StatementParser extends ExpressionParser {
     }
 
     node.left = init;
-    node.right = isForIn ? this.parseExpression() : this.parseMaybeAssign();
+    node.right = isForIn
+      ? this.parseExpression()
+      : this.parseMaybeAssignAllowIn();
     this.expect(tt.parenR);
 
     node.body =
@@ -1005,7 +1007,9 @@ export default class StatementParser extends ExpressionParser {
       const decl = this.startNode();
       this.parseVarId(decl, kind);
       if (this.eat(tt.eq)) {
-        decl.init = this.parseMaybeAssign(isFor);
+        decl.init = isFor
+          ? this.parseMaybeAssignDisallowIn()
+          : this.parseMaybeAssignAllowIn();
       } else {
         if (
           kind === "const" &&
@@ -1195,7 +1199,7 @@ export default class StatementParser extends ExpressionParser {
   // https://tc39.es/ecma262/#prod-ClassBody
   parseClassBody(
     constructorAllowsSuper: boolean,
-    oldStrict?: boolean,
+    oldStrict: boolean,
   ): N.ClassBody {
     this.classScope.enter();
 
@@ -1618,10 +1622,9 @@ export default class StatementParser extends ExpressionParser {
     node: N.ClassPrivateProperty,
   ): N.ClassPrivateProperty {
     this.scope.enter(SCOPE_CLASS | SCOPE_SUPER);
-    // [In] production parameter is tracked in parseMaybeAssign
     this.prodParam.enter(PARAM);
 
-    node.value = this.eat(tt.eq) ? this.parseMaybeAssign() : null;
+    node.value = this.eat(tt.eq) ? this.parseMaybeAssignAllowIn() : null;
     this.semicolon();
     this.prodParam.exit();
 
@@ -1636,13 +1639,12 @@ export default class StatementParser extends ExpressionParser {
     }
 
     this.scope.enter(SCOPE_CLASS | SCOPE_SUPER);
-    // [In] production parameter is tracked in parseMaybeAssign
     this.prodParam.enter(PARAM);
 
     if (this.match(tt.eq)) {
       this.expectPlugin("classProperties");
       this.next();
-      node.value = this.parseMaybeAssign();
+      node.value = this.parseMaybeAssignAllowIn();
     } else {
       node.value = null;
     }
@@ -1841,7 +1843,7 @@ export default class StatementParser extends ExpressionParser {
     } else if (this.match(tt._const) || this.match(tt._var) || this.isLet()) {
       throw this.raise(this.state.start, Errors.UnsupportedDefaultExport);
     } else {
-      const res = this.parseMaybeAssign();
+      const res = this.parseMaybeAssignAllowIn();
       this.semicolon();
       return res;
     }
@@ -2042,7 +2044,6 @@ export default class StatementParser extends ExpressionParser {
     name: string,
   ): void {
     if (this.state.exportedIdentifiers.indexOf(name) > -1) {
-      /* eslint-disable @babel/development-internal/dry-error-messages */
       this.raise(
         node.start,
         name === "default"
@@ -2050,7 +2051,6 @@ export default class StatementParser extends ExpressionParser {
           : Errors.DuplicateExport,
         name,
       );
-      /* eslint-enable @babel/development-internal/dry-error-messages */
     }
     this.state.exportedIdentifiers.push(name);
   }
