@@ -115,6 +115,8 @@ const FlowErrors = Object.freeze({
     'Unexpected token, expected "number" or "bigint"',
   UnexpectedTokenAfterTypeParameter:
     "Expected an arrow function after this type parameter declaration",
+  UnexpectedTypeParameterBeforeAsyncArrowFunction:
+    "Type parameters must come after the async keyword, e.g. instead of `<T> async () => {}`, use `async <T>() => {}`",
   UnsupportedDeclareExportKind:
     "`declare export %0` is not supported. Use `%1` instead",
   UnsupportedStatementInDeclareModule:
@@ -2674,28 +2676,66 @@ export default (superClass: Class<Parser>): Class<Parser> =>
 
         let typeParameters;
 
-        const arrow = this.tryParse(() => {
+        const arrow = this.tryParse(abort => {
           typeParameters = this.flowParseTypeParameterDeclaration();
 
           const arrowExpression = this.forwardNoArrowParamsConversionAt(
             typeParameters,
-            () =>
-              super.parseMaybeAssign(
+            () => {
+              const result = super.parseMaybeAssign(
                 refExpressionErrors,
                 afterLeftParse,
                 refNeedsArrowPos,
-              ),
+              );
+
+              this.resetStartLocationFromNode(result, typeParameters);
+
+              return result;
+            },
           );
-          arrowExpression.typeParameters = typeParameters;
-          this.resetStartLocationFromNode(arrowExpression, typeParameters);
+
+          // <T>(() => {}: any);
+          if (
+            arrowExpression.type !== "ArrowFunctionExpression" &&
+            arrowExpression.extra?.parenthesized
+          ) {
+            abort();
+          }
+
+          // The above can return a TypeCastExpression when the arrow
+          // expression is not wrapped in parens. See also `this.parseParenItem`.
+          const expr = this.maybeUnwrapTypeCastExpression(arrowExpression);
+          expr.typeParameters = typeParameters;
+          this.resetStartLocationFromNode(expr, typeParameters);
 
           return arrowExpression;
         }, state);
 
-        const arrowExpression: ?N.ArrowFunctionExpression =
-          arrow.node?.type === "ArrowFunctionExpression" ? arrow.node : null;
+        let arrowExpression: ?(
+          | N.ArrowFunctionExpression
+          | N.TypeCastExpression
+        ) = null;
 
-        if (!arrow.error && arrowExpression) return arrowExpression;
+        if (
+          arrow.node &&
+          this.maybeUnwrapTypeCastExpression(arrow.node).type ===
+            "ArrowFunctionExpression"
+        ) {
+          if (!arrow.error && !arrow.aborted) {
+            // <T> async () => {}
+            if (arrow.node.async) {
+              /*:: invariant(typeParameters) */
+              this.raise(
+                typeParameters.start,
+                FlowErrors.UnexpectedTypeParameterBeforeAsyncArrowFunction,
+              );
+            }
+
+            return arrow.node;
+          }
+
+          arrowExpression = arrow.node;
+        }
 
         // If we are here, both JSX and Flow parsing attempts failed.
         // Give the precedence to the JSX error, except if JSX had an
@@ -3481,5 +3521,9 @@ export default (superClass: Class<Parser>): Class<Parser> =>
         );
       }
       return false;
+    }
+
+    maybeUnwrapTypeCastExpression(node: N.Node) {
+      return node.type === "TypeCastExpression" ? node.expression : node;
     }
   };
