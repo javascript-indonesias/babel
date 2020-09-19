@@ -1795,12 +1795,20 @@ export default class ExpressionParser extends LValParser {
     return method.kind === "get" ? 0 : 1;
   }
 
+  // This exists so we can override within the ESTree plugin
+  getObjectOrClassMethodParams(method: N.ObjectMethod | N.ClassMethod) {
+    return method.params;
+  }
+
   // get methods aren't allowed to have any parameters
   // set methods must have exactly 1 parameter which is not a rest parameter
   checkGetterSetterParams(method: N.ObjectMethod | N.ClassMethod): void {
     const paramCount = this.getGetterSetterExpectedParamCount(method);
+    const params = this.getObjectOrClassMethodParams(method);
+
     const start = method.start;
-    if (method.params.length !== paramCount) {
+
+    if (params.length !== paramCount) {
       if (method.kind === "get") {
         this.raise(start, Errors.BadGetterArity);
       } else {
@@ -1810,7 +1818,7 @@ export default class ExpressionParser extends LValParser {
 
     if (
       method.kind === "set" &&
-      method.params[method.params.length - 1].type === "RestElement"
+      params[params.length - 1]?.type === "RestElement"
     ) {
       this.raise(start, Errors.BadSetterRestParameter);
     }
@@ -2118,7 +2126,8 @@ export default class ExpressionParser extends LValParser {
     this.state.inParameters = false;
 
     if (isExpression) {
-      node.body = this.parseMaybeAssignAllowIn();
+      // https://tc39.es/ecma262/#prod-ExpressionBody
+      node.body = this.parseMaybeAssign();
       this.checkParams(node, false, allowExpression, false);
     } else {
       const oldStrict = this.state.strict;

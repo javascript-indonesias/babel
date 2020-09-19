@@ -65,8 +65,12 @@ type ParsingContext =
 const TSErrors = Object.freeze({
   ClassMethodHasDeclare: "Class methods cannot have the 'declare' modifier",
   ClassMethodHasReadonly: "Class methods cannot have the 'readonly' modifier",
+  ConstructorHasTypeParameters:
+    "Type parameters cannot appear on a constructor declaration.",
   DeclareClassFieldHasInitializer:
     "'declare' class fields cannot have an initializer",
+  DeclareFunctionHasImplementation:
+    "An implementation cannot be declared in ambient contexts.",
   DuplicateModifier: "Duplicate modifier: '%0'",
   EmptyHeritageClauseType: "'%0' list cannot be empty.",
   IndexSignatureHasAbstract:
@@ -90,6 +94,8 @@ const TSErrors = Object.freeze({
     "Template literal types cannot have any substitution",
   TypeAnnotationAfterAssign:
     "Type annotations must come before default assignments, e.g. instead of `age = 25: number` use `age: number = 25`",
+  UnexpectedParameterModifier:
+    "A parameter property is only allowed in a constructor implementation.",
   UnexpectedReadonly:
     "'readonly' type modifier is only permitted on array and tuple literal types.",
   UnexpectedTypeAnnotation: "Did not expect a type annotation here.",
@@ -1465,41 +1471,49 @@ export default (superClass: Class<Parser>): Class<Parser> =>
         kind = "let";
       }
 
-      switch (starttype) {
-        case tt._function:
-          return this.parseFunctionStatement(
-            nany,
-            /* async */ false,
-            /* declarationPosition */ true,
-          );
-        case tt._class:
-          // While this is also set by tsParseExpressionStatement, we need to set it
-          // before parsing the class declaration to now how to register it in the scope.
-          nany.declare = true;
-          return this.parseClass(
-            nany,
-            /* isStatement */ true,
-            /* optionalId */ false,
-          );
-        case tt._const:
-          if (this.match(tt._const) && this.isLookaheadContextual("enum")) {
-            // `const enum = 0;` not allowed because "enum" is a strict mode reserved word.
-            this.expect(tt._const);
-            this.expectContextual("enum");
-            return this.tsParseEnumDeclaration(nany, /* isConst */ true);
-          }
-        // falls through
-        case tt._var:
-          kind = kind || this.state.value;
-          return this.parseVarStatement(nany, kind);
-        case tt.name: {
-          const value = this.state.value;
-          if (value === "global") {
-            return this.tsParseAmbientExternalModuleDeclaration(nany);
-          } else {
-            return this.tsParseDeclaration(nany, value, /* next */ true);
+      const oldIsDeclareContext = this.state.isDeclareContext;
+      this.state.isDeclareContext = true;
+
+      try {
+        switch (starttype) {
+          case tt._function:
+            nany.declare = true;
+            return this.parseFunctionStatement(
+              nany,
+              /* async */ false,
+              /* declarationPosition */ true,
+            );
+          case tt._class:
+            // While this is also set by tsParseExpressionStatement, we need to set it
+            // before parsing the class declaration to now how to register it in the scope.
+            nany.declare = true;
+            return this.parseClass(
+              nany,
+              /* isStatement */ true,
+              /* optionalId */ false,
+            );
+          case tt._const:
+            if (this.match(tt._const) && this.isLookaheadContextual("enum")) {
+              // `const enum = 0;` not allowed because "enum" is a strict mode reserved word.
+              this.expect(tt._const);
+              this.expectContextual("enum");
+              return this.tsParseEnumDeclaration(nany, /* isConst */ true);
+            }
+          // falls through
+          case tt._var:
+            kind = kind || this.state.value;
+            return this.parseVarStatement(nany, kind);
+          case tt.name: {
+            const value = this.state.value;
+            if (value === "global") {
+              return this.tsParseAmbientExternalModuleDeclaration(nany);
+            } else {
+              return this.tsParseDeclaration(nany, value, /* next */ true);
+            }
           }
         }
+      } finally {
+        this.state.isDeclareContext = oldIsDeclareContext;
       }
     }
 
@@ -1709,9 +1723,12 @@ export default (superClass: Class<Parser>): Class<Parser> =>
 
       let accessibility: ?N.Accessibility;
       let readonly = false;
-      if (allowModifiers) {
+      if (allowModifiers !== undefined) {
         accessibility = this.parseAccessModifier();
         readonly = !!this.tsParseModifier(["readonly"]);
+        if (allowModifiers === false && (accessibility || readonly)) {
+          this.raise(startPos, TSErrors.UnexpectedParameterModifier);
+        }
       }
 
       const left = this.parseMaybeDefault();
@@ -1756,6 +1773,16 @@ export default (superClass: Class<Parser>): Class<Parser> =>
       if (bodilessType && !this.match(tt.braceL) && this.isLineTerminator()) {
         this.finishNode(node, bodilessType);
         return;
+      }
+      if (bodilessType === "TSDeclareFunction" && this.state.isDeclareContext) {
+        this.raise(node.start, TSErrors.DeclareFunctionHasImplementation);
+        if (
+          // $FlowIgnore
+          node.declare
+        ) {
+          super.parseFunctionBodyAndFinish(node, bodilessType, isMethod);
+          return;
+        }
       }
 
       super.parseFunctionBodyAndFinish(node, type, isMethod);
@@ -2291,6 +2318,9 @@ export default (superClass: Class<Parser>): Class<Parser> =>
       allowsDirectSuper: boolean,
     ): void {
       const typeParameters = this.tsTryParseTypeParameters();
+      if (typeParameters && isConstructor) {
+        this.raise(typeParameters.start, TSErrors.ConstructorHasTypeParameters);
+      }
       if (typeParameters) method.typeParameters = typeParameters;
       super.pushClassMethod(
         classBody,
