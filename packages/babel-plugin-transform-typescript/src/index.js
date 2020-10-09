@@ -13,6 +13,8 @@ function isInType(path) {
     case "TSExpressionWithTypeArguments":
     case "TSTypeQuery":
       return true;
+    case "ExportSpecifier":
+      return path.parentPath.parent.exportKind === "type";
     default:
       return false;
   }
@@ -67,15 +69,24 @@ export default declare(
               `@babel/plugin-transform-typescript or @babel/preset-typescript is enabled.`,
           );
         }
-        if (node.definite || node.declare) {
+        if (node.declare) {
           if (node.value) {
             throw path.buildCodeFrameError(
-              `Definitely assigned fields and fields with the 'declare' modifier cannot` +
-                ` be initialized here, but only in the constructor`,
+              `Fields with the 'declare' modifier cannot be initialized here, but only in the constructor`,
             );
           }
-
           if (!node.decorators) {
+            path.remove();
+          }
+        } else if (node.definite) {
+          if (node.value) {
+            throw path.buildCodeFrameError(
+              `Definitely assigned fields cannot be initialized here, but only in the constructor`,
+            );
+          }
+          // keep the definitely assigned fields only when `allowDeclareFields` (equivalent of
+          // Typescript's `useDefineForClassFields`) is true
+          if (!allowDeclareFields && !node.decorators) {
             path.remove();
           }
         } else if (
