@@ -705,7 +705,7 @@ export type ClassBase = HasDecorators & {
 
 export type ClassBody = NodeBase & {
   type: "ClassBody",
-  body: Array<ClassMember | TsIndexSignature>, // TODO: $ReadOnlyArray
+  body: Array<ClassMember | StaticBlock | TsIndexSignature>, // TODO: $ReadOnlyArray
 };
 // | Placeholder<"ClassBody">;
 
@@ -718,6 +718,11 @@ export type ClassMemberBase = NodeBase &
     abstract?: ?true,
     optional?: ?true,
   };
+
+export type StaticBlock = NodeBase & {
+  type: "StaticBlock",
+  body: Array<Statement>,
+};
 
 export type ClassMember =
   | ClassMethod
@@ -842,7 +847,7 @@ export type ImportDeclaration = NodeBase & {
 
 export type ImportSpecifier = ModuleSpecifier & {
   type: "ImportSpecifier",
-  imported: Identifier,
+  imported: Identifier | StringLiteral,
 };
 
 export type ImportDefaultSpecifier = ModuleSpecifier & {
@@ -866,7 +871,7 @@ export type ExportNamedDeclaration = NodeBase & {
 
 export type ExportSpecifier = NodeBase & {
   type: "ExportSpecifier",
-  exported: Identifier,
+  exported: Identifier | StringLiteral,
   local: Identifier,
 };
 
@@ -1215,7 +1220,8 @@ export type TsKeywordTypeType =
   | "TSVoidKeyword"
   | "TSUndefinedKeyword"
   | "TSNullKeyword"
-  | "TSNeverKeyword";
+  | "TSNeverKeyword"
+  | "TSIntrinsicKeyword";
 export type TsKeywordType = TsTypeBase & {
   type: TsKeywordTypeType,
 };
@@ -1339,6 +1345,7 @@ export type TsMappedType = TsTypeBase & {
   typeParameter: TsTypeParameter,
   optional?: true | "+" | "-",
   typeAnnotation: ?TsType,
+  nameType: ?TsType,
 };
 
 export type TsLiteralType = TsTypeBase & {
@@ -1487,3 +1494,9 @@ export type ParseSubscriptState = {
   maybeAsyncArrow: boolean,
   stop: boolean,
 };
+
+export type ParseClassMemberState = {|
+  hadConstructor: boolean,
+  hadStaticBlock: boolean,
+  constructorAllowsSuper: boolean,
+|};

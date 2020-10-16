@@ -39,6 +39,8 @@ const FUNC_NO_FLAGS = 0b000,
   FUNC_HANGING_STATEMENT = 0b010,
   FUNC_NULLABLE_ID = 0b100;
 
+const loneSurrogate = /[\uD800-\uDFFF]/u;
+
 export default class StatementParser extends ExpressionParser {
   // ### Statement parsing
 
@@ -795,7 +797,7 @@ export default class StatementParser extends ExpressionParser {
   }
 
   // Parse a semicolon-enclosed block of statements, handling `"use
-  // strict"` declarations when `allowStrict` is true (used for
+  // strict"` declarations when `allowDirectives` is true (used for
   // function bodies).
 
   parseBlock(
@@ -1205,7 +1207,11 @@ export default class StatementParser extends ExpressionParser {
   ): N.ClassBody {
     this.classScope.enter();
 
-    const state = { hadConstructor: false };
+    const state: N.ParseClassMemberState = {
+      constructorAllowsSuper,
+      hadConstructor: false,
+      hadStaticBlock: false,
+    };
     let decorators: N.Decorator[] = [];
     const classBody: N.ClassBody = this.startNode();
     classBody.body = [];
@@ -1237,7 +1243,7 @@ export default class StatementParser extends ExpressionParser {
           decorators = [];
         }
 
-        this.parseClassMember(classBody, member, state, constructorAllowsSuper);
+        this.parseClassMember(classBody, member, state);
 
         if (
           member.kind === "constructor" &&
@@ -1303,31 +1309,33 @@ export default class StatementParser extends ExpressionParser {
   parseClassMember(
     classBody: N.ClassBody,
     member: N.ClassMember,
-    state: { hadConstructor: boolean },
-    constructorAllowsSuper: boolean,
+    state: N.ParseClassMemberState,
   ): void {
     const isStatic = this.isContextual("static");
 
-    if (isStatic && this.parseClassMemberFromModifier(classBody, member)) {
-      // a class element named 'static'
-      return;
+    if (isStatic) {
+      if (this.parseClassMemberFromModifier(classBody, member)) {
+        // a class element named 'static'
+        return;
+      }
+      if (this.eat(tt.braceL)) {
+        this.parseClassStaticBlock(
+          classBody,
+          ((member: any): N.StaticBlock),
+          state,
+        );
+        return;
+      }
     }
 
-    this.parseClassMemberWithIsStatic(
-      classBody,
-      member,
-      state,
-      isStatic,
-      constructorAllowsSuper,
-    );
+    this.parseClassMemberWithIsStatic(classBody, member, state, isStatic);
   }
 
   parseClassMemberWithIsStatic(
     classBody: N.ClassBody,
     member: N.ClassMember,
-    state: { hadConstructor: boolean },
+    state: N.ParseClassMemberState,
     isStatic: boolean,
-    constructorAllowsSuper: boolean,
   ) {
     const publicMethod: $FlowSubtype<N.ClassMethod> = member;
     const privateMethod: $FlowSubtype<N.ClassPrivateMethod> = member;
@@ -1394,7 +1402,7 @@ export default class StatementParser extends ExpressionParser {
           this.raise(key.start, Errors.DuplicateConstructor);
         }
         state.hadConstructor = true;
-        allowsDirectSuper = constructorAllowsSuper;
+        allowsDirectSuper = state.constructorAllowsSuper;
       }
 
       this.pushClassMethod(
@@ -1511,6 +1519,35 @@ export default class StatementParser extends ExpressionParser {
     }
 
     return key;
+  }
+
+  parseClassStaticBlock(
+    classBody: N.ClassBody,
+    member: N.StaticBlock & { decorators?: Array<N.Decorator> },
+    state: N.ParseClassMemberState,
+  ) {
+    this.expectPlugin("classStaticBlock", member.start);
+    // Start a new lexical scope
+    this.scope.enter(SCOPE_CLASS | SCOPE_SUPER);
+    // Start a new scope with regard to loop labels
+    const oldLabels = this.state.labels;
+    this.state.labels = [];
+    // ClassStaticBlockStatementList:
+    //   StatementList[~Yield, ~Await, ~Return] opt
+    this.prodParam.enter(PARAM);
+    const body = (member.body = []);
+    this.parseBlockOrModuleBlockBody(body, undefined, false, tt.braceR);
+    this.prodParam.exit();
+    this.scope.exit();
+    this.state.labels = oldLabels;
+    classBody.body.push(this.finishNode<N.StaticBlock>(member, "StaticBlock"));
+    if (state.hadStaticBlock) {
+      this.raise(member.start, Errors.DuplicateStaticBlock);
+    }
+    if (member.decorators?.length) {
+      this.raise(member.start, Errors.DecoratorStaticBlock);
+    }
+    state.hadStaticBlock = true;
   }
 
   pushClassProperty(classBody: N.ClassBody, prop: N.ClassProperty) {
@@ -1745,7 +1782,7 @@ export default class StatementParser extends ExpressionParser {
 
       this.next();
 
-      specifier.exported = this.parseIdentifier(true);
+      specifier.exported = this.parseModuleExportName();
       node.specifiers.push(
         this.finishNode(specifier, "ExportNamespaceSpecifier"),
       );
@@ -1938,19 +1975,27 @@ export default class StatementParser extends ExpressionParser {
       } else if (node.specifiers && node.specifiers.length) {
         // Named exports
         for (const specifier of node.specifiers) {
-          this.checkDuplicateExports(specifier, specifier.exported.name);
+          const { exported } = specifier;
+          const exportedName =
+            exported.type === "Identifier" ? exported.name : exported.value;
+          this.checkDuplicateExports(specifier, exportedName);
           // $FlowIgnore
           if (!isFrom && specifier.local) {
-            // check for keywords used as local names
-            this.checkReservedWord(
-              specifier.local.name,
-              specifier.local.start,
-              true,
-              false,
-            );
-            // check if export is defined
-            // $FlowIgnore
-            this.scope.checkLocalExport(specifier.local);
+            const { local } = specifier;
+            if (local.type === "StringLiteral") {
+              this.raise(
+                specifier.start,
+                Errors.ExportBindingIsString,
+                local.extra.raw,
+                exportedName,
+              );
+            } else {
+              // check for keywords used as local names
+              this.checkReservedWord(local.name, local.start, true, false);
+              // check if export is defined
+              // $FlowIgnore
+              this.scope.checkLocalExport(local);
+            }
           }
         }
       } else if (node.declaration) {
@@ -2006,6 +2051,7 @@ export default class StatementParser extends ExpressionParser {
   checkDuplicateExports(
     node:
       | N.Identifier
+      | N.StringLiteral
       | N.ExportNamedDeclaration
       | N.ExportSpecifier
       | N.ExportDefaultSpecifier,
@@ -2041,14 +2087,35 @@ export default class StatementParser extends ExpressionParser {
       }
 
       const node = this.startNode();
-      node.local = this.parseIdentifier(true);
+      node.local = this.parseModuleExportName();
       node.exported = this.eatContextual("as")
-        ? this.parseIdentifier(true)
+        ? this.parseModuleExportName()
         : node.local.__clone();
       nodes.push(this.finishNode(node, "ExportSpecifier"));
     }
 
     return nodes;
+  }
+
+  // https://tc39.es/ecma262/#prod-ModuleExportName
+  parseModuleExportName(): N.StringLiteral | N.Identifier {
+    if (this.match(tt.string)) {
+      this.expectPlugin("moduleStringNames");
+      const result = this.parseLiteral<N.StringLiteral>(
+        this.state.value,
+        "StringLiteral",
+      );
+      const surrogate = result.value.match(loneSurrogate);
+      if (surrogate) {
+        this.raise(
+          result.start,
+          Errors.ModuleExportNameHasLoneSurrogate,
+          surrogate[0].charCodeAt(0).toString(16),
+        );
+      }
+      return result;
+    }
+    return this.parseIdentifier(true);
   }
 
   // Parses import declaration.
@@ -2077,12 +2144,21 @@ export default class StatementParser extends ExpressionParser {
       this.expectContextual("from");
     }
     node.source = this.parseImportSource();
-    // https://github.com/tc39/proposal-module-attributes
-    // parse module attributes if the next token is `with` or ignore and finish the ImportDeclaration node.
-    const attributes = this.maybeParseModuleAttributes();
-    if (attributes) {
-      node.attributes = attributes;
+    // https://github.com/tc39/proposal-import-assertions
+    // parse module import assertions if the next token is `assert` or ignore
+    // and finish the ImportDeclaration node.
+    const assertions = this.maybeParseImportAssertions();
+    if (assertions) {
+      node.assertions = assertions;
     }
+    // todo(Babel 8): remove module attributes support
+    else {
+      const attributes = this.maybeParseModuleAttributes();
+      if (attributes) {
+        node.attributes = attributes;
+      }
+    }
+
     this.semicolon();
     return this.finishNode(node, "ImportDeclaration");
   }
@@ -2113,6 +2189,69 @@ export default class StatementParser extends ExpressionParser {
     node.specifiers.push(this.finishNode(specifier, type));
   }
 
+  parseAssertEntries() {
+    this.expectPlugin("importAssertions");
+
+    const attrs = [];
+    const attrNames = new Set();
+
+    do {
+      if (this.match(tt.braceR)) {
+        break;
+      }
+
+      const node = this.startNode();
+
+      // parse AssertionKey : IdentifierName, StringLiteral
+      let assertionKeyNode;
+      if (this.match(tt.string)) {
+        assertionKeyNode = this.parseLiteral(this.state.value, "StringLiteral");
+      } else {
+        assertionKeyNode = this.parseIdentifier(true);
+      }
+      this.next();
+      node.key = assertionKeyNode;
+
+      // for now we are only allowing `type` as the only allowed module attribute
+      if (node.key.name !== "type") {
+        this.raise(
+          node.key.start,
+          Errors.ModuleAttributeDifferentFromType,
+          node.key.name,
+        );
+      }
+      // check if we already have an entry for an attribute
+      // if a duplicate entry is found, throw an error
+      // for now this logic will come into play only when someone declares `type` twice
+      if (attrNames.has(node.key.name)) {
+        this.raise(
+          node.key.start,
+          Errors.ModuleAttributesWithDuplicateKeys,
+          node.key.name,
+        );
+      }
+      attrNames.add(node.key.name);
+
+      if (!this.match(tt.string)) {
+        throw this.unexpected(
+          this.state.start,
+          Errors.ModuleAttributeInvalidValue,
+        );
+      }
+      node.value = this.parseLiteral(this.state.value, "StringLiteral");
+      this.finishNode(node, "ImportAttribute");
+      attrs.push(node);
+    } while (this.eat(tt.comma));
+
+    return attrs;
+  }
+
+  /**
+   * parse module attributes
+   * @deprecated It will be removed in Babel 8
+   * @returns
+   * @memberof StatementParser
+   */
   maybeParseModuleAttributes() {
     if (this.match(tt._with) && !this.hasPrecedingLineBreak()) {
       this.expectPlugin("moduleAttributes");
@@ -2124,13 +2263,9 @@ export default class StatementParser extends ExpressionParser {
     const attrs = [];
     const attributes = new Set();
     do {
-      // we are trying to parse a node which has the following syntax
-      // with type: "json"
-      // [with -> keyword], [type -> Identifier], [":" -> token for colon], ["json" -> StringLiteral]
       const node = this.startNode();
       node.key = this.parseIdentifier(true);
 
-      // for now we are only allowing `type` as the only allowed module attribute
       if (node.key.name !== "type") {
         this.raise(
           node.key.start,
@@ -2139,9 +2274,6 @@ export default class StatementParser extends ExpressionParser {
         );
       }
 
-      // check if we already have an entry for an attribute
-      // if a duplicate entry is found, throw an error
-      // for now this logic will come into play only when someone declares `type` twice
       if (attributes.has(node.key.name)) {
         this.raise(
           node.key.start,
@@ -2151,7 +2283,6 @@ export default class StatementParser extends ExpressionParser {
       }
       attributes.add(node.key.name);
       this.expect(tt.colon);
-      // check if the value set to the module attribute is a string as we only allow string literals
       if (!this.match(tt.string)) {
         throw this.unexpected(
           this.state.start,
@@ -2162,6 +2293,26 @@ export default class StatementParser extends ExpressionParser {
       this.finishNode(node, "ImportAttribute");
       attrs.push(node);
     } while (this.eat(tt.comma));
+
+    return attrs;
+  }
+
+  maybeParseImportAssertions() {
+    if (
+      this.match(tt.name) &&
+      this.state.value === "assert" &&
+      !this.hasPrecedingLineBreak()
+    ) {
+      this.expectPlugin("importAssertions");
+      this.next();
+    } else {
+      if (this.hasPlugin("importAssertions")) return [];
+      return null;
+    }
+
+    this.eat(tt.braceL);
+    const attrs = this.parseAssertEntries();
+    this.eat(tt.braceR);
 
     return attrs;
   }
@@ -2220,17 +2371,20 @@ export default class StatementParser extends ExpressionParser {
   // https://tc39.es/ecma262/#prod-ImportSpecifier
   parseImportSpecifier(node: N.ImportDeclaration): void {
     const specifier = this.startNode();
-    specifier.imported = this.parseIdentifier(true);
+    specifier.imported = this.parseModuleExportName();
     if (this.eatContextual("as")) {
       specifier.local = this.parseIdentifier();
     } else {
-      this.checkReservedWord(
-        specifier.imported.name,
-        specifier.start,
-        true,
-        true,
-      );
-      specifier.local = specifier.imported.__clone();
+      const { imported } = specifier;
+      if (imported.type === "StringLiteral") {
+        throw this.raise(
+          specifier.start,
+          Errors.ImportBindingIsString,
+          imported.value,
+        );
+      }
+      this.checkReservedWord(imported.name, specifier.start, true, true);
+      specifier.local = imported.__clone();
     }
     this.checkLVal(
       specifier.local,

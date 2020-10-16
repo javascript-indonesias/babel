@@ -829,13 +829,18 @@ export default class ExpressionParser extends LValParser {
   ): N.Expression {
     if (node.callee.type === "Import") {
       if (node.arguments.length === 2) {
-        this.expectPlugin("moduleAttributes");
+        // todo(Babel 8): remove the if condition,
+        // moduleAttributes is renamed to importAssertions
+        if (!this.hasPlugin("moduleAttributes")) {
+          this.expectPlugin("importAssertions");
+        }
       }
       if (node.arguments.length === 0 || node.arguments.length > 2) {
         this.raise(
           node.start,
           Errors.ImportCallArity,
-          this.hasPlugin("moduleAttributes")
+          this.hasPlugin("importAssertions") ||
+            this.hasPlugin("moduleAttributes")
             ? "one or two arguments"
             : "one argument",
         );
@@ -872,7 +877,11 @@ export default class ExpressionParser extends LValParser {
       } else {
         this.expect(tt.comma);
         if (this.match(close)) {
-          if (dynamicImport && !this.hasPlugin("moduleAttributes")) {
+          if (
+            dynamicImport &&
+            !this.hasPlugin("importAssertions") &&
+            !this.hasPlugin("moduleAttributes")
+          ) {
             this.raise(
               this.state.lastTokStart,
               Errors.ImportCallArgumentTrailingComma,
@@ -1605,12 +1614,17 @@ export default class ExpressionParser extends LValParser {
     node.quasis = [curElt];
     while (!curElt.tail) {
       this.expect(tt.dollarBraceL);
-      node.expressions.push(this.parseExpression());
+      node.expressions.push(this.parseTemplateSubstitution());
       this.expect(tt.braceR);
       node.quasis.push((curElt = this.parseTemplateElement(isTagged)));
     }
     this.next();
     return this.finishNode(node, "TemplateLiteral");
+  }
+
+  // This is overwritten by the TypeScript plugin to parse template types
+  parseTemplateSubstitution(): N.Expression {
+    return this.parseExpression();
   }
 
   // Parse an object literal, binding pattern, or record.
@@ -2382,7 +2396,7 @@ export default class ExpressionParser extends LValParser {
       !this.scope.inNonArrowFunction &&
       word === "arguments"
     ) {
-      this.raise(startLoc, Errors.ArgumentsDisallowedInInitializer);
+      this.raise(startLoc, Errors.ArgumentsInClass);
       return;
     }
     if (checkKeywords && isKeyword(word)) {
