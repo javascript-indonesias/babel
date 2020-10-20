@@ -19,6 +19,15 @@ See [`eslint-plugin-babel`'s releases](https://github.com/babel/eslint-plugin-ba
 
 <!-- DO NOT CHANGE THESE COMMENTS - See .github/actions/trigger-github-release/update-changelog.js -->
 <!-- insert-new-changelog-here -->
+## v7.12.4 (2020-10-19)
+
+#### :bug: Bug Fix
+* `babel-helper-builder-react-jsx-experimental`, `babel-plugin-transform-react-jsx-development`, `babel-plugin-transform-react-jsx`, `babel-preset-react`
+  * [#12213](https://github.com/babel/babel/pull/12213) Revert "add `.js` extension to react runtime for JSX transform" ([@nicolo-ribaudo](https://github.com/nicolo-ribaudo))
+
+#### :house: Internal
+* Other
+  * [#12202](https://github.com/babel/babel/pull/12202) Run jest's tests in the e2e tests ([@nicolo-ribaudo](https://github.com/nicolo-ribaudo))
 ## v7.12.3 (2020-10-16)
 
 #### :bug: Bug Fix
