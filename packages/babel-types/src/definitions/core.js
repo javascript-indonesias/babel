@@ -980,7 +980,7 @@ defineType("SwitchStatement", {
 });
 
 defineType("ThisExpression", {
-  aliases: ["Expression"],
+  aliases: ["Expression", "Pureish"],
 });
 
 defineType("ThrowStatement", {
@@ -1464,6 +1464,12 @@ defineType("ExportNamedDeclaration", {
         },
       ),
     },
+    assertions: {
+      validate: chain(
+        assertValueType("array"),
+        assertNodeType("ImportAttribute"),
+      ),
+    },
     specifiers: {
       default: [],
       validate: chain(
@@ -1559,6 +1565,12 @@ defineType("ImportDeclaration", {
   visitor: ["specifiers", "source"],
   aliases: ["Statement", "Declaration", "ModuleDeclaration"],
   fields: {
+    assertions: {
+      validate: chain(
+        assertValueType("array"),
+        assertNodeType("ImportAttribute"),
+      ),
+    },
     specifiers: {
       validate: chain(
         assertValueType("array"),
@@ -1785,7 +1797,7 @@ defineType("SpreadElement", {
 });
 
 defineType("Super", {
-  aliases: ["Expression"],
+  aliases: ["Expression", "Pureish"],
 });
 
 defineType("TaggedTemplateExpression", {
