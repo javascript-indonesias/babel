@@ -409,7 +409,6 @@ __metadata:
     "@babel/core": "workspace:*"
     "@babel/helper-annotate-as-pure": "workspace:^7.10.4"
     "@babel/helper-plugin-test-runner": "workspace:*"
-    "@babel/helper-regex": "workspace:^7.10.4"
     regexpu-core: ^4.7.1
   peerDependencies:
     "@babel/core": ^7.0.0
@@ -646,7 +645,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@babel/helper-regex@workspace:^7.10.4, @babel/helper-regex@workspace:packages/babel-helper-regex":
+"@babel/helper-regex@workspace:packages/babel-helper-regex":
   version: 0.0.0-use.local
   resolution: "@babel/helper-regex@workspace:packages/babel-helper-regex"
   dependencies:
@@ -1078,15 +1077,15 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@babel/plugin-proposal-export-namespace-from@npm:^7.12.0":
-  version: 7.12.0
-  resolution: "@babel/plugin-proposal-export-namespace-from@npm:7.12.0"
+"@babel/plugin-proposal-export-namespace-from@npm:^7.12.0, @babel/plugin-proposal-export-namespace-from@npm:^7.12.1":
+  version: 7.12.1
+  resolution: "@babel/plugin-proposal-export-namespace-from@npm:7.12.1"
   dependencies:
     "@babel/helper-plugin-utils": ^7.10.4
     "@babel/plugin-syntax-export-namespace-from": ^7.8.3
   peerDependencies:
     "@babel/core": ^7.0.0-0
-  checksum: 371d59486a28445f51352b498d22c372de6b8ae59f44a0d62de626498f162372b596430bedbc869e1ea6c0397aa1cb33dc806e7872da6d67625316fb8a019023
+  checksum: ae5317ca008cc9eb2890b1f238156fbb990e5030fd1b7f123a5d11d89f8617a867b11db129aeafe51ef3bb4dddc4059e8172ddf99e8cdc42cbfa2a45dce1a16b
   languageName: node
   linkType: hard
 
@@ -2748,7 +2747,6 @@ __metadata:
     "@babel/core": "workspace:*"
     "@babel/helper-plugin-test-runner": "workspace:*"
     "@babel/helper-plugin-utils": "workspace:^7.10.4"
-    "@babel/helper-regex": "workspace:^7.10.4"
   peerDependencies:
     "@babel/core": ^7.0.0-0
   languageName: unknown
@@ -4814,7 +4812,7 @@ __metadata:
     "@babel/eslint-parser": "workspace:*"
     "@babel/eslint-plugin-development": "workspace:*"
     "@babel/eslint-plugin-development-internal": "workspace:*"
-    "@babel/plugin-proposal-dynamic-import": ^7.10.4
+    "@babel/plugin-proposal-export-namespace-from": ^7.12.1
     "@babel/plugin-proposal-object-rest-spread": ^7.11.0
     "@babel/plugin-transform-for-of": ^7.10.4
     "@babel/plugin-transform-modules-commonjs": ^7.10.4
@@ -5346,10 +5344,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"caniuse-lite@npm:1.0.30001077":
-  version: 1.0.30001077
-  resolution: "caniuse-lite@npm:1.0.30001077"
-  checksum: 8c57dfba3e0da11c01fdaad6a3517c0259ce24006b2c1d542827d725c5f5ed5be7a18d7efdbfe4ae879d2fc01e2fa5445c31e76835a8abc9013f7bfa35c42e8e
+"caniuse-lite@npm:1.0.30001158":
+  version: 1.0.30001158
+  resolution: "caniuse-lite@npm:1.0.30001158"
+  checksum: 5e8e370bd6bf104dcec4761f88721ed8140ae45bf7cf69e9a82ff4f31d3cc1da6bf339c0231e3c67aa227108ce0fc18e990b4a251c73216f8c473837fe9f361b
   languageName: node
   linkType: hard
 
