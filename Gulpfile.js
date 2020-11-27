@@ -22,8 +22,19 @@ const { terser: rollupTerser } = require("rollup-plugin-terser");
 
 const defaultSourcesGlob = "./@(codemods|packages|eslint)/*/src/**/*.{js,ts}";
 
-function swapSrcWithLib(srcPath) {
-  const parts = srcPath.split(path.sep);
+/**
+ * map source code path to the generated artifacts path
+ * @example
+ * mapSrcToLib("packages/babel-core/src/index.js")
+ * // returns "packages/babel-core/lib/index.js"
+ * @example
+ * mapSrcToLib("packages/babel-template/src/index.ts")
+ * // returns "packages/babel-template/lib/index.js"
+ * @param {string} srcPath
+ * @returns {string}
+ */
+function mapSrcToLib(srcPath) {
+  const parts = srcPath.replace(/\.ts$/, ".js").split(path.sep);
   parts[2] = "lib";
   return parts.join(path.sep);
 }
@@ -72,7 +83,7 @@ function buildBabel(exclude, sourcesGlob = defaultSourcesGlob) {
 
   return stream
     .pipe(errorsLogger())
-    .pipe(newer({ dest: base, map: swapSrcWithLib }))
+    .pipe(newer({ dest: base, map: mapSrcToLib }))
     .pipe(compilationLogger())
     .pipe(
       babel({
@@ -85,7 +96,7 @@ function buildBabel(exclude, sourcesGlob = defaultSourcesGlob) {
     .pipe(
       // Passing 'file.relative' because newer() above uses a relative
       // path and this keeps it consistent.
-      rename(file => path.resolve(file.base, swapSrcWithLib(file.relative)))
+      rename(file => path.resolve(file.base, mapSrcToLib(file.relative)))
     )
     .pipe(gulp.dest(base));
 }
@@ -102,7 +113,13 @@ const babelVersion =
 function buildRollup(packages) {
   const sourcemap = process.env.NODE_ENV === "production";
   return Promise.all(
-    packages.map(async ({ src, format, dest, name, filename, version }) => {
+    packages.map(async ({ src, format, dest, name, filename }) => {
+      const pkgJSON = require("./" + src + "/package.json");
+      const version = pkgJSON.version + versionSuffix;
+      const { dependencies = {}, peerDependencies = {} } = pkgJSON;
+      const external = Object.keys(dependencies).concat(
+        Object.keys(peerDependencies)
+      );
       let nodeResolveBrowser = false,
         babelEnvName = "rollup";
       switch (src) {
@@ -115,6 +132,7 @@ function buildRollup(packages) {
       fancyLog(`Compiling '${chalk.cyan(input)}' with rollup ...`);
       const bundle = await rollup.rollup({
         input,
+        external,
         plugins: [
           rollupBabelSource(),
           rollupReplace({
@@ -161,6 +179,7 @@ function buildRollup(packages) {
         format,
         name,
         sourcemap: sourcemap,
+        exports: "named",
       });
 
       if (!process.env.IS_PUBLISH) {
@@ -180,6 +199,7 @@ function buildRollup(packages) {
         format,
         name,
         sourcemap: sourcemap,
+        exports: "named",
         plugins: [
           rollupTerser({
             // workaround https://bugs.webkit.org/show_bug.cgi?id=212725
@@ -194,13 +214,14 @@ function buildRollup(packages) {
 }
 
 const libBundles = [
-  {
-    src: "packages/babel-parser",
-    format: "cjs",
-    dest: "lib",
-    version: require("./packages/babel-parser/package").version + versionSuffix,
-  },
-];
+  "packages/babel-parser",
+  "packages/babel-plugin-proposal-optional-chaining",
+  "packages/babel-helper-member-expression-to-functions",
+].map(src => ({
+  src,
+  format: "cjs",
+  dest: "lib",
+}));
 
 const standaloneBundle = [
   {
