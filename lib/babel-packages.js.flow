@@ -34,3 +34,28 @@ declare module "@babel/template" {
     program: Program,
   };
 }
+
+declare module "@babel/helper-optimise-call-expression" {
+  declare export default function optimiseCallExpression(
+    callee: BabelNodeExpression,
+    thisNode: BabelNodeExpression,
+    args: $Readonly<Array<BabelNodeExpression | BabelNodeSpreadElement>>,
+    optional: boolean
+  ): BabelNodeCallExpression | BabelNodeOptionalCallExpression;
+}
+
+declare module "@babel/helper-get-function-arity" {
+  declare export default function helperGetFunctionArity(
+    node: BabelNodeFunction
+  ): number;
+}
+
+declare module "@babel/helper-annotate-as-pure" {
+  declare export default function annotateAsPure(
+    pathOrNode:
+      | BabelNode
+      | {
+          node: BabelNode,
+        }
+  ): void;
+}
