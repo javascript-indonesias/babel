@@ -157,3 +157,14 @@ declare module "@babel/helper-validator-option" {
     arr: $ReadonlyArray<string>
   ): string;
 }
+
+declare module "@babel/helper-function-name" {
+  declare export default function helperFunctionNamefunction(
+    options: any,
+    localBinding?: boolean
+  ): any;
+}
+
+declare module "@babel/helper-split-export-declaration" {
+  declare export default function splitExportDeclaration(exportDeclaration: any): any;
+}
