@@ -2,8 +2,6 @@ FLOW_COMMIT = a1f9a4c709dcebb27a5084acf47755fbae699c25
 TEST262_COMMIT = 36d2d2d348d83e9d6554af59a672fbcd9413914b
 TYPESCRIPT_COMMIT = da8633212023517630de5f3620a23736b63234b1
 
-FORCE_PUBLISH = -f @babel/runtime -f @babel/runtime-corejs2 -f @babel/runtime-corejs3 -f @babel/standalone
-
 # Fix color output until TravisCI fixes https://github.com/travis-ci/travis-ci/issues/7967
 export FORCE_COLOR = true
 
@@ -42,8 +40,9 @@ generate-type-helpers:
 build-flow-typings:
 	$(NODE) packages/babel-types/scripts/generators/flow.js > packages/babel-types/lib/index.js.flow
 
-build-typescript-3.7-typings:
-	$(NODE) packages/babel-types/scripts/generators/typescript-3.7.js > packages/babel-types/lib/index-ts3.7.d.ts
+# For TypeScript older than 3.7
+build-typescript-legacy-typings:
+	$(NODE) packages/babel-types/scripts/generators/typescript-legacy.js > packages/babel-types/lib/index-legacy.d.ts
 
 build-standalone: build-babel-standalone
 
@@ -70,8 +69,7 @@ build-no-bundle: clean clean-lib
 	BABEL_ENV=development $(YARN) gulp build-dev
 	# Ensure that build artifacts for types are created during local
 	# development too.
-	# Babel-transform-fixture-test-runner requires minified polyfill for performance
-	$(MAKE) build-flow-typings build-polyfill-dist
+	$(MAKE) build-flow-typings
 
 watch: build-no-bundle
 	BABEL_ENV=development $(YARN) gulp watch
@@ -194,7 +192,7 @@ prepublish-prepare-dts:
 	$(MAKE) tscheck
 	$(YARN) gulp bundle-dts
 	$(YARN) gulp clean-dts
-	$(MAKE) build-typescript-3.7-typings
+	$(MAKE) build-typescript-legacy-typings
 	$(MAKE) clean-tsconfig
 
 prepublish:
@@ -205,7 +203,7 @@ prepublish:
 
 new-version:
 	git pull --rebase
-	$(YARN) release-tool version $(FORCE_PUBLISH)
+	$(YARN) release-tool version -f @babel/standalone
 
 # NOTE: Run make new-version first
 publish:
