@@ -1,5 +1,5 @@
 FLOW_COMMIT = a1f9a4c709dcebb27a5084acf47755fbae699c25
-TEST262_COMMIT = 36d2d2d348d83e9d6554af59a672fbcd9413914b
+TEST262_COMMIT = b2e9dff2816cceb5ee84c0c226c50a31d01a7297
 TYPESCRIPT_COMMIT = da8633212023517630de5f3620a23736b63234b1
 
 # Fix color output until TravisCI fixes https://github.com/travis-ci/travis-ci/issues/7967
@@ -55,11 +55,7 @@ build-babel-standalone:
 prepublish-build-standalone:
 	BABEL_ENV=production IS_PUBLISH=true $(YARN) gulp build-babel-standalone
 
-build-dist: build-polyfill-dist build-plugin-transform-runtime-dist
-
-build-polyfill-dist:
-	cd packages/babel-polyfill; \
-	scripts/build-dist.sh
+build-dist: build-plugin-transform-runtime-dist
 
 build-plugin-transform-runtime-dist:
 	cd packages/babel-plugin-transform-runtime; \
@@ -109,8 +105,6 @@ build-compat-data:
 
 clean: test-clean
 	rm -f .npmrc
-	rm -rf packages/babel-polyfill/browser*
-	rm -rf packages/babel-polyfill/dist
 	rm -rf coverage
 	rm -rf packages/*/npm-debug*
 	rm -rf node_modules/.cache
@@ -222,17 +216,6 @@ ifneq ("$(shell grep 3155328e5 .yarn/releases/yarn-*.cjs -c)", "0")
 	@echo "Please run \`sed -i -e "s/3155328e5/4567890e5/g" .yarn/releases/yarn-*.cjs\`"
 	@exit 1
 endif
-
-publish-ci: prepublish
-ifneq ("$(NPM_TOKEN)", "")
-	echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > .npmrc
-else
-	echo "Missing NPM_TOKEN env var"
-	exit 1
-endif
-	$(YARN) release-tool publish --yes
-	rm -f .npmrc
-	$(MAKE) clean
 
 publish-test:
 ifneq ("$(I_AM_USING_VERDACCIO)", "I_AM_SURE")
