@@ -39,7 +39,7 @@ __metadata:
   dependencies:
     "@babel/core": "workspace:*"
     "@babel/helper-fixtures": "workspace:*"
-    "@nicolo-ribaudo/chokidar-2": 2.1.8-no-fsevents
+    "@nicolo-ribaudo/chokidar-2": "condition:BABEL_8_BREAKING ? : 2.1.8-no-fsevents"
     chokidar: ^3.4.0
     commander: ^4.0.1
     convert-source-map: ^1.1.0
@@ -139,6 +139,7 @@ __metadata:
     "@babel/types": "workspace:^7.12.10"
     convert-source-map: ^1.7.0
     debug: ^4.1.0
+    escape-string-regexp: "condition:BABEL_8_BREAKING ? ^4.0.0 : "
     gensync: ^1.0.0-beta.1
     json5: ^2.1.2
     lodash: ^4.17.19
@@ -250,7 +251,7 @@ __metadata:
     "@babel/helper-fixtures": "workspace:*"
     "@babel/parser": "workspace:*"
     "@babel/types": "workspace:^7.12.11"
-    jsesc: ^2.5.1
+    jsesc: "condition: BABEL_8_BREAKING ? ^3.0.2 : ^2.5.1"
     source-map: ^0.5.0
   languageName: unknown
   linkType: soft
@@ -759,6 +760,7 @@ __metadata:
     "@babel/core": "workspace:^7.12.10"
     "@babel/helper-fixtures": "workspace:^7.12.12"
     babel-check-duplicated-nodes: ^1.0.0
+    escape-string-regexp: "condition:BABEL_8_BREAKING ? ^4.0.0 : "
     jest-diff: ^24.8.0
     lodash: ^4.17.19
     quick-lru: 5.1.0
@@ -3146,6 +3148,7 @@ __metadata:
     "@babel/core": "workspace:*"
     "@babel/plugin-transform-modules-commonjs": "workspace:*"
     browserify: ^16.5.2
+    escape-string-regexp: "condition:BABEL_8_BREAKING ? ^4.0.0 : "
     find-cache-dir: "condition:BABEL_8_BREAKING ? ^3.3.1 : ^2.0.0"
     lodash: ^4.17.19
     make-dir: ^2.1.0
@@ -3631,7 +3634,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@nicolo-ribaudo/chokidar-2@npm:2.1.8-no-fsevents":
+"@nicolo-ribaudo/chokidar-2-BABEL_8_BREAKING-false@npm:@nicolo-ribaudo/chokidar-2@2.1.8-no-fsevents":
   version: 2.1.8-no-fsevents
   resolution: "@nicolo-ribaudo/chokidar-2@npm:2.1.8-no-fsevents"
   dependencies:
@@ -3647,6 +3650,15 @@ __metadata:
     readdirp: ^2.2.1
     upath: ^1.1.1
   checksum: 0efeea3b7d9e3c07dc3ded371ba65351a7c30314763f6e2d34849bf58809655f0f9bd71fcd505ab72624cd17e80e738a0bd41aac0d7d8606664817f3fe85cfba
+  languageName: node
+  linkType: hard
+
+"@nicolo-ribaudo/chokidar-2@condition:BABEL_8_BREAKING ? : 2.1.8-no-fsevents":
+  version: 0.0.0-condition-52373d
+  resolution: "@nicolo-ribaudo/chokidar-2@condition:BABEL_8_BREAKING?:2.1.8-no-fsevents#52373d"
+  dependencies:
+    "@nicolo-ribaudo/chokidar-2-BABEL_8_BREAKING-false": "npm:@nicolo-ribaudo/chokidar-2@2.1.8-no-fsevents"
+  checksum: 28d0f0cd6401170f34c90ba4ca41ad11b07cef27c8b45db56e06d9d758294d5c7a8864dab4aab37aad30e1ad26f936c5d7a141185ee7ded754b5fc7b13d35f21
   languageName: node
   linkType: hard
 
@@ -6458,6 +6470,22 @@ __metadata:
   languageName: node
   linkType: hard
 
+"escape-string-regexp-BABEL_8_BREAKING-true@npm:escape-string-regexp@^4.0.0":
+  version: 4.0.0
+  resolution: "escape-string-regexp@npm:4.0.0"
+  checksum: c747be8d5ff7873127e3e0cffe7d2206a37208077fa9c30a3c1bb4f26bebd081c8c24d5fba7a99449f9d20670bea3dc5e1b6098b0f074b099bd38766271a272f
+  languageName: node
+  linkType: hard
+
+"escape-string-regexp@condition:BABEL_8_BREAKING ? ^4.0.0 : ":
+  version: 0.0.0-condition-76f759
+  resolution: "escape-string-regexp@condition:BABEL_8_BREAKING?^4.0.0:#76f759"
+  dependencies:
+    escape-string-regexp-BABEL_8_BREAKING-true: "npm:escape-string-regexp@^4.0.0"
+  checksum: 1c6b06b9d1094aa0c4bcb60d0d8d82237c35a11132cddf9ecf3fe52a356ae1cf5a65a7d2cfc19cfdb7397474dbbfeafeab74944a5f5e35a6e615db7019209a7d
+  languageName: node
+  linkType: hard
+
 "escape-string-regexp@npm:^1.0.2, escape-string-regexp@npm:^1.0.5":
   version: 1.0.5
   resolution: "escape-string-regexp@npm:1.0.5"
@@ -9182,12 +9210,31 @@ fsevents@^1.2.7:
   languageName: node
   linkType: hard
 
-"jsesc@npm:^2.5.1":
+"jsesc-BABEL_8_BREAKING-false@npm:jsesc@^2.5.1, jsesc@npm:^2.5.1":
   version: 2.5.2
   resolution: "jsesc@npm:2.5.2"
   bin:
     jsesc: bin/jsesc
   checksum: ca91ec33d74c55959e4b6fdbfee2af5f38be74a752cf0a982702e3a16239f26c2abbe19f5f84b15592570dda01872e929a90738615bd445f7b9b859781cfcf68
+  languageName: node
+  linkType: hard
+
+"jsesc-BABEL_8_BREAKING-true@npm:jsesc@^3.0.2":
+  version: 3.0.2
+  resolution: "jsesc@npm:3.0.2"
+  bin:
+    jsesc: bin/jsesc
+  checksum: 809c7663241f76c42528e2706f011d43c0eaa19b50a5d6f4015b4b9563292c0ffad1f5b12a9a41b71e2206efc5ae3632e8b27c35cb3ef508c0a58a3bb011da90
+  languageName: node
+  linkType: hard
+
+"jsesc@condition: BABEL_8_BREAKING ? ^3.0.2 : ^2.5.1":
+  version: 0.0.0-condition-31d9b4
+  resolution: "jsesc@condition:BABEL_8_BREAKING?^3.0.2:^2.5.1#31d9b4"
+  dependencies:
+    jsesc-BABEL_8_BREAKING-false: "npm:jsesc@^2.5.1"
+    jsesc-BABEL_8_BREAKING-true: "npm:jsesc@^3.0.2"
+  checksum: d6751e397e85958087fffcb6fbe5892902d2455e98ff0d69b69d0b15103892465d60aa0d750199a5d45cca75bbd89c4854b80ef4cbb98b229e3e9fa4e567d968
   languageName: node
   linkType: hard
 
