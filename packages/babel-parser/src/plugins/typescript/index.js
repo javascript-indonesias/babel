@@ -74,6 +74,8 @@ const TSErrors = Object.freeze({
   EmptyHeritageClauseType: "'%0' list cannot be empty.",
   EmptyTypeArguments: "Type argument list cannot be empty.",
   EmptyTypeParameters: "Type parameter list cannot be empty.",
+  ExpectedAmbientAfterExportDeclare:
+    "'export declare' must be followed by an ambient declaration.",
   IndexSignatureHasAbstract:
     "Index signatures cannot have the 'abstract' modifier",
   IndexSignatureHasAccessibility:
@@ -85,6 +87,8 @@ const TSErrors = Object.freeze({
     "Tuple members must be labeled with a simple identifier.",
   MixedLabeledAndUnlabeledElements:
     "Tuple members must all have names or all not have names.",
+  NonAbstractClassHasAbstractMethod:
+    "Abstract methods can only appear within an abstract class.",
   OptionalTypeBeforeRequired:
     "A required element cannot follow an optional element.",
   PatternIsOptional:
@@ -2170,6 +2174,10 @@ export default (superClass: Class<Parser>): Class<Parser> =>
         return;
       }
 
+      if (!this.state.inAbstractClass && (member: any).abstract) {
+        this.raise(member.start, TSErrors.NonAbstractClassHasAbstractMethod);
+      }
+
       /*:: invariant(member.type !== "TSIndexSignature") */
 
       super.parseClassMemberWithIsStatic(classBody, member, state, isStatic);
@@ -2280,6 +2288,16 @@ export default (superClass: Class<Parser>): Class<Parser> =>
 
       // "export declare" is equivalent to just "export".
       const isDeclare = this.eatContextual("declare");
+
+      if (
+        isDeclare &&
+        (this.isContextual("declare") || !this.shouldParseExportDeclaration())
+      ) {
+        throw this.raise(
+          this.state.start,
+          TSErrors.ExpectedAmbientAfterExportDeclare,
+        );
+      }
 
       let declaration: ?N.Declaration;
 
@@ -2821,6 +2839,16 @@ export default (superClass: Class<Parser>): Class<Parser> =>
         return cb();
       } finally {
         this.state.isDeclareContext = oldIsDeclareContext;
+      }
+    }
+
+    parseClass<T: N.Class>(node: T, ...args: any[]): T {
+      const oldInAbstractClass = this.state.inAbstractClass;
+      this.state.inAbstractClass = !!(node: any).abstract;
+      try {
+        return super.parseClass(node, ...args);
+      } finally {
+        this.state.inAbstractClass = oldInAbstractClass;
       }
     }
   };
