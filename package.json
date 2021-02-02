@@ -32,7 +32,7 @@
     "@babel/register": "^7.12.0",
     "@babel/runtime": "^7.12.0",
     "@rollup/plugin-babel": "^5.2.0",
-    "@rollup/plugin-commonjs": "^13.0.0",
+    "@rollup/plugin-commonjs": "^17.1.0",
     "@rollup/plugin-json": "^4.1.0",
     "@rollup/plugin-node-resolve": "^9.0.0",
     "@rollup/plugin-replace": "^2.3.3",
@@ -110,6 +110,7 @@
     "labels": {
       "PR: Spec Compliance :eyeglasses:": ":eyeglasses: Spec Compliance",
       "PR: Breaking Change :boom:": ":boom: Breaking Change",
+      "PR: Deprecation: :loudspeaker:": ":loudspeaker: Deprecation",
       "PR: New Feature :rocket:": ":rocket: New Feature",
       "PR: Bug Fix :bug:": ":bug: Bug Fix",
       "PR: Polish :nail_care:": ":nail_care: Polish",
