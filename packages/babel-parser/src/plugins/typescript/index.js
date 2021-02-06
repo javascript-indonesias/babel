@@ -935,20 +935,17 @@ export default (superClass: Class<Parser>): Class<Parser> =>
       parseConstituentType: () => N.TsType,
       operator: TokenType,
     ): N.TsType {
-      this.eat(operator);
-      let type = parseConstituentType();
-      if (this.match(operator)) {
-        const types = [type];
-        while (this.eat(operator)) {
-          types.push(parseConstituentType());
-        }
-        const node: N.TsUnionType | N.TsIntersectionType = this.startNodeAtNode(
-          type,
-        );
-        node.types = types;
-        type = this.finishNode(node, kind);
+      const node: N.TsUnionType | N.TsIntersectionType = this.startNode();
+      const hasLeadingOperator = this.eat(operator);
+      const types = [];
+      do {
+        types.push(parseConstituentType());
+      } while (this.eat(operator));
+      if (types.length === 1 && !hasLeadingOperator) {
+        return types[0];
       }
-      return type;
+      node.types = types;
+      return this.finishNode(node, kind);
     }
 
     tsParseIntersectionTypeOrHigher(): N.TsType {
@@ -1071,6 +1068,7 @@ export default (superClass: Class<Parser>): Class<Parser> =>
             node.asserts = true;
             thisTypePredicate = this.finishNode(node, "TSTypePredicate");
           } else {
+            this.resetStartLocationFromNode(thisTypePredicate, node);
             (thisTypePredicate: N.TsTypePredicate).asserts = true;
           }
           t.typeAnnotation = thisTypePredicate;
