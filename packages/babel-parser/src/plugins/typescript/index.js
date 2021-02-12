@@ -36,9 +36,7 @@ type TsModifier =
   | "abstract"
   | "declare"
   | "static"
-  | "public"
-  | "private"
-  | "protected";
+  | N.Accessibility;
 
 function nonNull<T>(x: ?T): T {
   if (x == null) {
@@ -71,6 +69,7 @@ const TSErrors = Object.freeze({
   DeclareFunctionHasImplementation:
     "An implementation cannot be declared in ambient contexts.",
   DuplicateModifier: "Duplicate modifier: '%0'",
+  DuplicateAccessibilityModifier: "Accessibility modifier already seen.",
   EmptyHeritageClauseType: "'%0' list cannot be empty.",
   EmptyTypeArguments: "Type argument list cannot be empty.",
   EmptyTypeParameters: "Type parameter list cannot be empty.",
@@ -89,6 +88,8 @@ const TSErrors = Object.freeze({
     "Tuple members must all have names or all not have names.",
   NonAbstractClassHasAbstractMethod:
     "Abstract methods can only appear within an abstract class.",
+  NonClassMethodPropertyHasAbstractModifer:
+    "'abstract' modifier can only appear on a class, method, or property declaration.",
   OptionalTypeBeforeRequired:
     "A required element cannot follow an optional element.",
   PatternIsOptional:
@@ -144,6 +145,12 @@ function keywordTypeFromName(
   }
 }
 
+function tsIsAccessModifier(modifier: string): boolean %checks {
+  return (
+    modifier === "private" || modifier === "public" || modifier === "protected"
+  );
+}
+
 export default (superClass: Class<Parser>): Class<Parser> =>
   class extends superClass {
     getScopeHandler(): Class<TypeScriptScopeHandler> {
@@ -194,20 +201,31 @@ export default (superClass: Class<Parser>): Class<Parser> =>
      *    this.tsParseModifiers(node, ["public"]);
      *    this.tsParseModifiers(node, ["abstract", "readonly"]);
      */
-    tsParseModifiers<T: TsModifier>(
-      modified: { [key: TsModifier]: ?true },
-      allowedModifiers: T[],
+    tsParseModifiers(
+      modified: {
+        [key: TsModifier]: ?true,
+        accessibility?: N.Accessibility,
+      },
+      allowedModifiers: TsModifier[],
     ): void {
       for (;;) {
         const startPos = this.state.start;
-        const modifier: ?T = this.tsParseModifier(allowedModifiers);
+        const modifier: ?TsModifier = this.tsParseModifier(allowedModifiers);
 
         if (!modifier) break;
 
-        if (Object.hasOwnProperty.call(modified, modifier)) {
-          this.raise(startPos, TSErrors.DuplicateModifier, modifier);
+        if (tsIsAccessModifier(modifier)) {
+          if (modified.accessibility) {
+            this.raise(startPos, TSErrors.DuplicateAccessibilityModifier);
+          } else {
+            modified.accessibility = modifier;
+          }
+        } else {
+          if (Object.hasOwnProperty.call(modified, modifier)) {
+            this.raise(startPos, TSErrors.DuplicateModifier, modifier);
+          }
+          modified[modifier] = true;
         }
-        modified[modifier] = true;
       }
     }
 
@@ -1585,20 +1603,13 @@ export default (superClass: Class<Parser>): Class<Parser> =>
     ): ?N.Declaration {
       switch (value) {
         case "abstract":
-          if (this.tsCheckLineTerminatorAndMatch(tt._class, next)) {
-            const cls: N.ClassDeclaration = node;
-            cls.abstract = true;
-            if (next) {
-              this.next();
-              if (!this.match(tt._class)) {
-                this.unexpected(null, tt._class);
-              }
-            }
-            return this.parseClass(
-              cls,
-              /* isStatement */ true,
-              /* optionalId */ false,
-            );
+          if (
+            this.tsCheckLineTerminatorAndMatch(tt._class, next) ||
+            // for interface
+            this.tsCheckLineTerminatorAndMatch(tt.name, next)
+          ) {
+            if (next) this.next();
+            return this.tsParseAbstractDeclaration(node);
           }
           break;
 
@@ -2125,10 +2136,12 @@ export default (superClass: Class<Parser>): Class<Parser> =>
       member: any,
       state: N.ParseClassMemberState,
     ): void {
-      this.tsParseModifiers(member, ["declare"]);
-      const accessibility = this.parseAccessModifier();
-      if (accessibility) member.accessibility = accessibility;
-      this.tsParseModifiers(member, ["declare"]);
+      this.tsParseModifiers(member, [
+        "declare",
+        "private",
+        "public",
+        "protected",
+      ]);
 
       const callParseClassMember = () => {
         super.parseClassMember(classBody, member, state);
@@ -2847,6 +2860,38 @@ export default (superClass: Class<Parser>): Class<Parser> =>
         return super.parseClass(node, ...args);
       } finally {
         this.state.inAbstractClass = oldInAbstractClass;
+      }
+    }
+
+    tsParseAbstractDeclaration(
+      node: any,
+    ): N.ClassDeclaration | N.TsInterfaceDeclaration | typeof undefined {
+      if (this.match(tt._class)) {
+        node.abstract = true;
+        return this.parseClass<N.ClassDeclaration>(
+          (node: N.ClassDeclaration),
+          /* isStatement */ true,
+          /* optionalId */ false,
+        );
+      } else if (this.isContextual("interface")) {
+        // for invalid abstract interface
+
+        // To avoid
+        //   abstract interface
+        //   Foo {}
+        if (!this.hasFollowingLineBreak()) {
+          node.abstract = true;
+          this.raise(
+            node.start,
+            TSErrors.NonClassMethodPropertyHasAbstractModifer,
+          );
+          this.next();
+          return this.tsParseInterfaceDeclaration(
+            (node: N.TsInterfaceDeclaration),
+          );
+        }
+      } else {
+        this.unexpected(null, tt._class);
       }
     }
   };
