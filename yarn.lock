@@ -94,7 +94,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@babel/compat-data@workspace:packages/babel-compat-data"
   dependencies:
-    core-js-compat: ^3.8.3
+    core-js-compat: ^3.9.0
     electron-to-chromium: 1.3.583
     lodash: ^4.17.19
     mdn-browser-compat-data: 1.0.38
@@ -125,19 +125,19 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@babel/core@workspace:*, @babel/core@workspace:^7.12.13, @babel/core@workspace:packages/babel-core":
+"@babel/core@workspace:*, @babel/core@workspace:^7.12.13, @babel/core@workspace:^7.12.17, @babel/core@workspace:packages/babel-core":
   version: 0.0.0-use.local
   resolution: "@babel/core@workspace:packages/babel-core"
   dependencies:
     "@babel/code-frame": "workspace:^7.12.13"
-    "@babel/generator": "workspace:^7.12.15"
-    "@babel/helper-module-transforms": "workspace:^7.12.13"
+    "@babel/generator": "workspace:^7.12.17"
+    "@babel/helper-module-transforms": "workspace:^7.12.17"
     "@babel/helper-transform-fixture-test-runner": "workspace:*"
-    "@babel/helpers": "workspace:^7.12.13"
-    "@babel/parser": "workspace:^7.12.16"
+    "@babel/helpers": "workspace:^7.12.17"
+    "@babel/parser": "workspace:^7.12.17"
     "@babel/template": "workspace:^7.12.13"
-    "@babel/traverse": "workspace:^7.12.13"
-    "@babel/types": "workspace:^7.12.13"
+    "@babel/traverse": "workspace:^7.12.17"
+    "@babel/types": "workspace:^7.12.17"
     convert-source-map: ^1.7.0
     debug: ^4.1.0
     escape-string-regexp: "condition:BABEL_8_BREAKING ? ^4.0.0 : "
@@ -246,13 +246,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@babel/generator@workspace:*, @babel/generator@workspace:^7.12.13, @babel/generator@workspace:^7.12.15, @babel/generator@workspace:packages/babel-generator":
+"@babel/generator@workspace:*, @babel/generator@workspace:^7.12.13, @babel/generator@workspace:^7.12.17, @babel/generator@workspace:packages/babel-generator":
   version: 0.0.0-use.local
   resolution: "@babel/generator@workspace:packages/babel-generator"
   dependencies:
     "@babel/helper-fixtures": "workspace:*"
     "@babel/parser": "workspace:*"
-    "@babel/types": "workspace:^7.12.13"
+    "@babel/types": "workspace:^7.12.17"
     "@types/jsesc": ^2.5.0
     "@types/lodash": ^4.14.150
     "@types/source-map": ^0.5.0
@@ -339,13 +339,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@babel/helper-compilation-targets@workspace:^7.12.16, @babel/helper-compilation-targets@workspace:packages/babel-helper-compilation-targets":
+"@babel/helper-compilation-targets@workspace:^7.12.17, @babel/helper-compilation-targets@workspace:packages/babel-helper-compilation-targets":
   version: 0.0.0-use.local
   resolution: "@babel/helper-compilation-targets@workspace:packages/babel-helper-compilation-targets"
   dependencies:
     "@babel/compat-data": "workspace:^7.12.13"
     "@babel/core": "workspace:*"
-    "@babel/helper-validator-option": "workspace:^7.12.16"
+    "@babel/helper-validator-option": "workspace:^7.12.17"
     browserslist: ^4.14.5
     semver: ^5.5.0
   peerDependencies:
@@ -368,13 +368,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@babel/helper-create-class-features-plugin@workspace:^7.12.13, @babel/helper-create-class-features-plugin@workspace:^7.12.16, @babel/helper-create-class-features-plugin@workspace:packages/babel-helper-create-class-features-plugin":
+"@babel/helper-create-class-features-plugin@workspace:^7.12.13, @babel/helper-create-class-features-plugin@workspace:^7.12.17, @babel/helper-create-class-features-plugin@workspace:packages/babel-helper-create-class-features-plugin":
   version: 0.0.0-use.local
   resolution: "@babel/helper-create-class-features-plugin@workspace:packages/babel-helper-create-class-features-plugin"
   dependencies:
     "@babel/core": "workspace:*"
     "@babel/helper-function-name": "workspace:^7.12.13"
-    "@babel/helper-member-expression-to-functions": "workspace:^7.12.16"
+    "@babel/helper-member-expression-to-functions": "workspace:^7.12.17"
     "@babel/helper-optimise-call-expression": "workspace:^7.12.13"
     "@babel/helper-plugin-test-runner": "workspace:*"
     "@babel/helper-replace-supers": "workspace:^7.12.13"
@@ -550,11 +550,11 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@babel/helper-member-expression-to-functions@workspace:^7.12.13, @babel/helper-member-expression-to-functions@workspace:^7.12.16, @babel/helper-member-expression-to-functions@workspace:packages/babel-helper-member-expression-to-functions":
+"@babel/helper-member-expression-to-functions@workspace:^7.12.13, @babel/helper-member-expression-to-functions@workspace:^7.12.17, @babel/helper-member-expression-to-functions@workspace:packages/babel-helper-member-expression-to-functions":
   version: 0.0.0-use.local
   resolution: "@babel/helper-member-expression-to-functions@workspace:packages/babel-helper-member-expression-to-functions"
   dependencies:
-    "@babel/types": "workspace:^7.12.13"
+    "@babel/types": "workspace:^7.12.17"
   languageName: unknown
   linkType: soft
 
@@ -593,7 +593,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@babel/helper-module-transforms@workspace:^7.12.13, @babel/helper-module-transforms@workspace:packages/babel-helper-module-transforms":
+"@babel/helper-module-transforms@workspace:^7.12.13, @babel/helper-module-transforms@workspace:^7.12.17, @babel/helper-module-transforms@workspace:packages/babel-helper-module-transforms":
   version: 0.0.0-use.local
   resolution: "@babel/helper-module-transforms@workspace:packages/babel-helper-module-transforms"
   dependencies:
@@ -603,8 +603,8 @@ __metadata:
     "@babel/helper-split-export-declaration": "workspace:^7.12.13"
     "@babel/helper-validator-identifier": "workspace:^7.12.11"
     "@babel/template": "workspace:^7.12.13"
-    "@babel/traverse": "workspace:^7.12.13"
-    "@babel/types": "workspace:^7.12.13"
+    "@babel/traverse": "workspace:^7.12.17"
+    "@babel/types": "workspace:^7.12.17"
     lodash: ^4.17.19
   languageName: unknown
   linkType: soft
@@ -762,11 +762,10 @@ __metadata:
   resolution: "@babel/helper-transform-fixture-test-runner@workspace:packages/babel-helper-transform-fixture-test-runner"
   dependencies:
     "@babel/code-frame": "workspace:^7.12.13"
-    "@babel/core": "workspace:^7.12.13"
+    "@babel/core": "workspace:^7.12.17"
     "@babel/helper-fixtures": "workspace:^7.12.13"
     babel-check-duplicated-nodes: ^1.0.0
     escape-string-regexp: "condition:BABEL_8_BREAKING ? ^4.0.0 : "
-    jest-diff: ^24.8.0
     lodash: ^4.17.19
     quick-lru: 5.1.0
     regenerator-runtime: ^0.13.7
@@ -797,7 +796,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@babel/helper-validator-option@workspace:^7.12.16, @babel/helper-validator-option@workspace:packages/babel-helper-validator-option":
+"@babel/helper-validator-option@workspace:^7.12.17, @babel/helper-validator-option@workspace:packages/babel-helper-validator-option":
   version: 0.0.0-use.local
   resolution: "@babel/helper-validator-option@workspace:packages/babel-helper-validator-option"
   languageName: unknown
@@ -837,14 +836,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@babel/helpers@workspace:*, @babel/helpers@workspace:^7.12.13, @babel/helpers@workspace:packages/babel-helpers":
+"@babel/helpers@workspace:*, @babel/helpers@workspace:^7.12.17, @babel/helpers@workspace:packages/babel-helpers":
   version: 0.0.0-use.local
   resolution: "@babel/helpers@workspace:packages/babel-helpers"
   dependencies:
     "@babel/helper-plugin-test-runner": "workspace:*"
     "@babel/template": "workspace:^7.12.13"
-    "@babel/traverse": "workspace:^7.12.13"
-    "@babel/types": "workspace:^7.12.13"
+    "@babel/traverse": "workspace:^7.12.17"
+    "@babel/types": "workspace:^7.12.17"
   languageName: unknown
   linkType: soft
 
@@ -903,7 +902,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@babel/parser@workspace:*, @babel/parser@workspace:^7.12.13, @babel/parser@workspace:^7.12.16, @babel/parser@workspace:packages/babel-parser":
+"@babel/parser@workspace:*, @babel/parser@workspace:^7.12.13, @babel/parser@workspace:^7.12.17, @babel/parser@workspace:packages/babel-parser":
   version: 0.0.0-use.local
   resolution: "@babel/parser@workspace:packages/babel-parser"
   dependencies:
@@ -1060,7 +1059,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@babel/plugin-proposal-dynamic-import@workspace:*, @babel/plugin-proposal-dynamic-import@workspace:^7.12.16, @babel/plugin-proposal-dynamic-import@workspace:packages/babel-plugin-proposal-dynamic-import":
+"@babel/plugin-proposal-dynamic-import@workspace:*, @babel/plugin-proposal-dynamic-import@workspace:^7.12.17, @babel/plugin-proposal-dynamic-import@workspace:packages/babel-plugin-proposal-dynamic-import":
   version: 0.0.0-use.local
   resolution: "@babel/plugin-proposal-dynamic-import@workspace:packages/babel-plugin-proposal-dynamic-import"
   dependencies:
@@ -1305,7 +1304,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@babel/plugin-proposal-optional-chaining@workspace:*, @babel/plugin-proposal-optional-chaining@workspace:^7.12.16, @babel/plugin-proposal-optional-chaining@workspace:packages/babel-plugin-proposal-optional-chaining":
+"@babel/plugin-proposal-optional-chaining@workspace:*, @babel/plugin-proposal-optional-chaining@workspace:^7.12.17, @babel/plugin-proposal-optional-chaining@workspace:packages/babel-plugin-proposal-optional-chaining":
   version: 0.0.0-use.local
   resolution: "@babel/plugin-proposal-optional-chaining@workspace:packages/babel-plugin-proposal-optional-chaining"
   dependencies:
@@ -2543,7 +2542,7 @@ __metadata:
   dependencies:
     "@babel/core": "workspace:*"
     "@babel/helper-plugin-test-runner": "workspace:*"
-    "@babel/plugin-transform-react-jsx": "workspace:^7.12.16"
+    "@babel/plugin-transform-react-jsx": "workspace:^7.12.17"
   peerDependencies:
     "@babel/core": ^7.0.0-0
   languageName: unknown
@@ -2575,7 +2574,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@babel/plugin-transform-react-jsx@workspace:*, @babel/plugin-transform-react-jsx@workspace:^7.12.13, @babel/plugin-transform-react-jsx@workspace:^7.12.16, @babel/plugin-transform-react-jsx@workspace:packages/babel-plugin-transform-react-jsx":
+"@babel/plugin-transform-react-jsx@workspace:*, @babel/plugin-transform-react-jsx@workspace:^7.12.13, @babel/plugin-transform-react-jsx@workspace:^7.12.17, @babel/plugin-transform-react-jsx@workspace:packages/babel-plugin-transform-react-jsx":
   version: 0.0.0-use.local
   resolution: "@babel/plugin-transform-react-jsx@workspace:packages/babel-plugin-transform-react-jsx"
   dependencies:
@@ -2585,7 +2584,7 @@ __metadata:
     "@babel/helper-plugin-test-runner": "workspace:*"
     "@babel/helper-plugin-utils": "workspace:^7.12.13"
     "@babel/plugin-syntax-jsx": "workspace:^7.12.13"
-    "@babel/types": "workspace:^7.12.13"
+    "@babel/types": "workspace:^7.12.17"
   peerDependencies:
     "@babel/core": ^7.0.0-0
   languageName: unknown
@@ -2833,12 +2832,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@babel/plugin-transform-typescript@workspace:*, @babel/plugin-transform-typescript@workspace:^7.12.16, @babel/plugin-transform-typescript@workspace:packages/babel-plugin-transform-typescript":
+"@babel/plugin-transform-typescript@workspace:*, @babel/plugin-transform-typescript@workspace:^7.12.17, @babel/plugin-transform-typescript@workspace:packages/babel-plugin-transform-typescript":
   version: 0.0.0-use.local
   resolution: "@babel/plugin-transform-typescript@workspace:packages/babel-plugin-transform-typescript"
   dependencies:
     "@babel/core": "workspace:*"
-    "@babel/helper-create-class-features-plugin": "workspace:^7.12.16"
+    "@babel/helper-create-class-features-plugin": "workspace:^7.12.17"
     "@babel/helper-plugin-test-runner": "workspace:*"
     "@babel/helper-plugin-utils": "workspace:^7.12.13"
     "@babel/plugin-syntax-typescript": "workspace:^7.12.13"
@@ -2978,14 +2977,14 @@ __metadata:
   dependencies:
     "@babel/compat-data": "workspace:^7.12.13"
     "@babel/core": "workspace:*"
-    "@babel/helper-compilation-targets": "workspace:^7.12.16"
+    "@babel/helper-compilation-targets": "workspace:^7.12.17"
     "@babel/helper-module-imports": "workspace:^7.12.13"
     "@babel/helper-plugin-test-runner": "workspace:*"
     "@babel/helper-plugin-utils": "workspace:^7.12.13"
-    "@babel/helper-validator-option": "workspace:^7.12.16"
+    "@babel/helper-validator-option": "workspace:^7.12.17"
     "@babel/plugin-proposal-async-generator-functions": "workspace:^7.12.13"
     "@babel/plugin-proposal-class-properties": "workspace:^7.12.13"
-    "@babel/plugin-proposal-dynamic-import": "workspace:^7.12.16"
+    "@babel/plugin-proposal-dynamic-import": "workspace:^7.12.17"
     "@babel/plugin-proposal-export-namespace-from": "workspace:^7.12.13"
     "@babel/plugin-proposal-json-strings": "workspace:^7.12.13"
     "@babel/plugin-proposal-logical-assignment-operators": "workspace:^7.12.13"
@@ -2993,7 +2992,7 @@ __metadata:
     "@babel/plugin-proposal-numeric-separator": "workspace:^7.12.13"
     "@babel/plugin-proposal-object-rest-spread": "workspace:^7.12.13"
     "@babel/plugin-proposal-optional-catch-binding": "workspace:^7.12.13"
-    "@babel/plugin-proposal-optional-chaining": "workspace:^7.12.16"
+    "@babel/plugin-proposal-optional-chaining": "workspace:^7.12.17"
     "@babel/plugin-proposal-private-methods": "workspace:^7.12.13"
     "@babel/plugin-proposal-unicode-property-regex": "workspace:^7.12.13"
     "@babel/plugin-syntax-async-generators": ^7.8.0
@@ -3041,8 +3040,8 @@ __metadata:
     "@babel/plugin-transform-unicode-escapes": "workspace:^7.12.13"
     "@babel/plugin-transform-unicode-regex": "workspace:^7.12.13"
     "@babel/preset-modules": ^0.1.3
-    "@babel/types": "workspace:^7.12.13"
-    core-js-compat: ^3.8.0
+    "@babel/types": "workspace:^7.12.17"
+    core-js-compat: ^3.9.0
     semver: ^5.5.0
   peerDependencies:
     "@babel/core": ^7.0.0-0
@@ -3124,8 +3123,8 @@ __metadata:
     "@babel/core": "workspace:*"
     "@babel/helper-plugin-test-runner": "workspace:*"
     "@babel/helper-plugin-utils": "workspace:^7.12.13"
-    "@babel/helper-validator-option": "workspace:^7.12.16"
-    "@babel/plugin-transform-typescript": "workspace:^7.12.16"
+    "@babel/helper-validator-option": "workspace:^7.12.17"
+    "@babel/plugin-transform-typescript": "workspace:^7.12.17"
   peerDependencies:
     "@babel/core": ^7.0.0-0
   languageName: unknown
@@ -3352,17 +3351,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@babel/traverse@workspace:*, @babel/traverse@workspace:^7.12.13, @babel/traverse@workspace:packages/babel-traverse":
+"@babel/traverse@workspace:*, @babel/traverse@workspace:^7.12.13, @babel/traverse@workspace:^7.12.17, @babel/traverse@workspace:packages/babel-traverse":
   version: 0.0.0-use.local
   resolution: "@babel/traverse@workspace:packages/babel-traverse"
   dependencies:
     "@babel/code-frame": "workspace:^7.12.13"
-    "@babel/generator": "workspace:^7.12.13"
+    "@babel/generator": "workspace:^7.12.17"
     "@babel/helper-function-name": "workspace:^7.12.13"
     "@babel/helper-plugin-test-runner": "workspace:*"
     "@babel/helper-split-export-declaration": "workspace:^7.12.13"
-    "@babel/parser": "workspace:^7.12.13"
-    "@babel/types": "workspace:^7.12.13"
+    "@babel/parser": "workspace:^7.12.17"
+    "@babel/types": "workspace:^7.12.17"
     debug: ^4.1.0
     globals: "condition:BABEL_8_BREAKING ? ^13.5.0 : ^11.1.0"
     lodash: ^4.17.19
@@ -3380,7 +3379,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@babel/types@workspace:*, @babel/types@workspace:^7.12.1, @babel/types@workspace:^7.12.13, @babel/types@workspace:packages/babel-types":
+"@babel/types@workspace:*, @babel/types@workspace:^7.12.1, @babel/types@workspace:^7.12.13, @babel/types@workspace:^7.12.17, @babel/types@workspace:packages/babel-types":
   version: 0.0.0-use.local
   resolution: "@babel/types@workspace:packages/babel-types"
   dependencies:
@@ -3612,17 +3611,6 @@ __metadata:
     source-map: ^0.6.1
     write-file-atomic: ^3.0.0
   checksum: e26fbbd0f012742b218f9432e642218f9bfc43057e53b9edc934161092642b69338dbddca3c6254d0bbf2d9519878400b80542226255adb6880af2e5eba7f69e
-  languageName: node
-  linkType: hard
-
-"@jest/types@npm:^24.9.0":
-  version: 24.9.0
-  resolution: "@jest/types@npm:24.9.0"
-  dependencies:
-    "@types/istanbul-lib-coverage": ^2.0.0
-    "@types/istanbul-reports": ^1.1.1
-    "@types/yargs": ^13.0.0
-  checksum: 7cd388ad9d3a6de7e0ca29cbaf34dd9da9f6485d26747fc2ef6732bf06dc98d79519b7f3684b7287bd6d5168c394d8f806dc1343bd3c1b3cdc3e85486a518c63
   languageName: node
   linkType: hard
 
@@ -3892,16 +3880,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/istanbul-reports@npm:^1.1.1":
-  version: 1.1.2
-  resolution: "@types/istanbul-reports@npm:1.1.2"
-  dependencies:
-    "@types/istanbul-lib-coverage": "*"
-    "@types/istanbul-lib-report": "*"
-  checksum: 92bd1f76a4ce16f5390c80b6b0e657171faf0003b0ff370b3c37739087c825d664493c9debf442c0871d864f1be15c88460f2399ae748186d1a944f16958aea4
-  languageName: node
-  linkType: hard
-
 "@types/istanbul-reports@npm:^3.0.0":
   version: 3.0.0
   resolution: "@types/istanbul-reports@npm:3.0.0"
@@ -3994,15 +3972,6 @@ __metadata:
   version: 15.0.0
   resolution: "@types/yargs-parser@npm:15.0.0"
   checksum: 74bfaefde90fb28eace49469fa6c2da63161176cb6dfbd2cfea2c3cb3268e4ca6abe174ae3ff7e633a49a6d6d1a114901c78799a19d0cbc5a9b539585afe6c4f
-  languageName: node
-  linkType: hard
-
-"@types/yargs@npm:^13.0.0":
-  version: 13.0.11
-  resolution: "@types/yargs@npm:13.0.11"
-  dependencies:
-    "@types/yargs-parser": "*"
-  checksum: 8592d76c18ae57c25e9eeff29a63c2e0885527014ebd6d76244440d5dc1c6e0cf70753d256d77c09f516b082241e6124c1a83a72c061ee83cf5722d5d52f452f
   languageName: node
   linkType: hard
 
@@ -4315,7 +4284,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"ansi-regex@npm:^4.0.0, ansi-regex@npm:^4.1.0":
+"ansi-regex@npm:^4.1.0":
   version: 4.1.0
   resolution: "ansi-regex@npm:4.1.0"
   checksum: 53b6fe447cf92ee59739379de637af6f86b3b8a9537fbfe36a66f946f1d9d34afc3efe664ac31bcc7c3af042d43eabcfcfd3f790316d474bbc7b19a4b1d132dd
@@ -5394,7 +5363,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"chalk@npm:^2.0.0, chalk@npm:^2.0.1, chalk@npm:^2.4.1, chalk@npm:^2.4.2":
+"chalk@npm:^2.0.0, chalk@npm:^2.4.1, chalk@npm:^2.4.2":
   version: 2.4.2
   resolution: "chalk@npm:2.4.2"
   dependencies:
@@ -5796,13 +5765,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"core-js-compat@npm:^3.6.2, core-js-compat@npm:^3.7.0, core-js-compat@npm:^3.8.0, core-js-compat@npm:^3.8.3":
-  version: 3.8.3
-  resolution: "core-js-compat@npm:3.8.3"
+"core-js-compat@npm:^3.6.2, core-js-compat@npm:^3.7.0, core-js-compat@npm:^3.9.0":
+  version: 3.9.0
+  resolution: "core-js-compat@npm:3.9.0"
   dependencies:
-    browserslist: ^4.16.1
+    browserslist: ^4.16.3
     semver: 7.0.0
-  checksum: 37e14264fa8a2a2e4afa1f85414296a536593b7fb5e1e08004de668d75107a7fc2083f1854c65c6c1b1e3fcb202ca6c9a3d0b514a9308b6f064d9f21b3dfa59b
+  checksum: ebcd01c9ad2b3114cfcf9316a8d324dffc2e1362249f48b734e941e8de32e1c7f5f859198a212c0af2e6cef3164fc4457817b4568faec46f815ebb8dcb8f8f11
   languageName: node
   linkType: hard
 
@@ -6191,13 +6160,6 @@ __metadata:
   bin:
     detective: bin/detective.js
   checksum: 3dd4582ab18a66f093fd8a74509336012ae483546df92b69e91722abc72842174717a352668852150e103ca197653658f8595e8f5ab8a3eeb2a918ae8bd4ae92
-  languageName: node
-  linkType: hard
-
-"diff-sequences@npm:^24.9.0":
-  version: 24.9.0
-  resolution: "diff-sequences@npm:24.9.0"
-  checksum: 049107ba804c3a332fe7edefd1cec8df33a18a99c6af77f88b3b9d22b5ee2e1940dbde23b97f97b0d7250a98f8c488c3ba552ebab54dc75c9542c1e90232d009
   languageName: node
   linkType: hard
 
@@ -8754,18 +8716,6 @@ fsevents@^1.2.7:
   languageName: node
   linkType: hard
 
-"jest-diff@npm:^24.8.0":
-  version: 24.9.0
-  resolution: "jest-diff@npm:24.9.0"
-  dependencies:
-    chalk: ^2.0.1
-    diff-sequences: ^24.9.0
-    jest-get-type: ^24.9.0
-    pretty-format: ^24.9.0
-  checksum: ba4aa10e5712ad365700921c90362dae8c2ab5b2c599b6f64fc4f3013f6208d760cb2980d491010e602e4a36b28a5c18fceba251f7602929d93300ae03ae931c
-  languageName: node
-  linkType: hard
-
 "jest-diff@npm:^26.6.1":
   version: 26.6.1
   resolution: "jest-diff@npm:26.6.1"
@@ -8826,13 +8776,6 @@ fsevents@^1.2.7:
     jest-mock: ^26.6.1
     jest-util: ^26.6.1
   checksum: 34a72db1cc38c4df34d9522b5631db0593035636bc8a0ffd692ee7aacbff0fab68e476413da68b517d65b09ab8c68062e0f948bdfb6efb91a0fb3707870cdbc1
-  languageName: node
-  linkType: hard
-
-"jest-get-type@npm:^24.9.0":
-  version: 24.9.0
-  resolution: "jest-get-type@npm:24.9.0"
-  checksum: 0e6164dff23f8cd664a46642d2167b743e67349c57ff908259b56e3f5c81f8d2a13de2dd473a1a3d7682adcfe85888d14b0496ba51c5c8095eb52bf7526c3918
   languageName: node
   linkType: hard
 
@@ -10991,18 +10934,6 @@ fsevents@^1.2.7:
   languageName: node
   linkType: hard
 
-"pretty-format@npm:^24.9.0":
-  version: 24.9.0
-  resolution: "pretty-format@npm:24.9.0"
-  dependencies:
-    "@jest/types": ^24.9.0
-    ansi-regex: ^4.0.0
-    ansi-styles: ^3.2.0
-    react-is: ^16.8.4
-  checksum: a61c5c21a638239ebdc9bfe259746dc1aca29555f8da997318031ebee3ea36662f60f329132365c0cace2a0d122a1f7f9550261b3f04aaa18029d16efc5b45fe
-  languageName: node
-  linkType: hard
-
 "pretty-format@npm:^26.6.1":
   version: 26.6.1
   resolution: "pretty-format@npm:26.6.1"
@@ -11177,13 +11108,6 @@ fsevents@^1.2.7:
     randombytes: ^2.0.5
     safe-buffer: ^5.1.0
   checksum: 24658ce99e0a325f27d157fbff9b111f9fa2f56876031ac9a09bcd6c5ae53d3c3f1b124d7e1b813803ee1b09e50dd1561ac7f7a8ba2930319cbcda5e827602ab
-  languageName: node
-  linkType: hard
-
-"react-is@npm:^16.8.4":
-  version: 16.13.1
-  resolution: "react-is@npm:16.13.1"
-  checksum: 11bcf1267a314a522615f626f3ce3727a3a24cdbf61c4d452add3550a7875326669631326cfb1ba3e92b6f72244c32ffecf93ad21c0cad8455d3e169d0e3f060
   languageName: node
   linkType: hard
 
