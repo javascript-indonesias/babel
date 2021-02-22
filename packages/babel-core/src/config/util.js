@@ -1,20 +1,19 @@
 // @flow
 
-import type { ValidatedOptions } from "./validation/options";
+import type { ValidatedOptions, NormalizedOptions } from "./validation/options";
 
 export function mergeOptions(
   target: ValidatedOptions,
-  source: ValidatedOptions,
+  source: ValidatedOptions | NormalizedOptions,
 ): void {
   for (const k of Object.keys(source)) {
-    if (k === "parserOpts" && source.parserOpts) {
-      const parserOpts = source.parserOpts;
-      const targetObj = (target.parserOpts = target.parserOpts || {});
+    if (
+      (k === "parserOpts" || k === "generatorOpts" || k === "assumptions") &&
+      source[k]
+    ) {
+      const parserOpts = source[k];
+      const targetObj = target[k] || (target[k] = {});
       mergeDefaultFields(targetObj, parserOpts);
-    } else if (k === "generatorOpts" && source.generatorOpts) {
-      const generatorOpts = source.generatorOpts;
-      const targetObj = (target.generatorOpts = target.generatorOpts || {});
-      mergeDefaultFields(targetObj, generatorOpts);
     } else {
       const val = source[k];
       if (val !== undefined) target[k] = (val: any);

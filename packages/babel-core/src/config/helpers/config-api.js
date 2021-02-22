@@ -1,6 +1,8 @@
 // @flow
 
 import semver from "semver";
+import type { Targets } from "@babel/helper-compilation-targets";
+
 import { version as coreVersion } from "../../";
 import {
   assertSimpleType,
@@ -11,6 +13,8 @@ import {
 
 import type { CallerMetadata } from "../validation/options";
 
+import * as Context from "../cache-contexts";
+
 type EnvFunction = {
   (): string,
   <T>((string) => T): T,
@@ -20,7 +24,11 @@ type EnvFunction = {
 
 type CallerFactory = ((CallerMetadata | void) => mixed) => SimpleType;
 
-export type PluginAPI = {|
+type TargetsFunction = () => Targets;
+
+type AssumptionFunction = (name: string) => boolean | void;
+
+export type ConfigAPI = {|
   version: string,
   cache: SimpleCacheConfigurator,
   env: EnvFunction,
@@ -29,9 +37,19 @@ export type PluginAPI = {|
   caller?: CallerFactory,
 |};
 
-export default function makeAPI(
-  cache: CacheConfigurator<{ envName: string, caller: CallerMetadata | void }>,
-): PluginAPI {
+export type PresetAPI = {|
+  ...ConfigAPI,
+  targets: TargetsFunction,
+|};
+
+export type PluginAPI = {|
+  ...PresetAPI,
+  assumption: AssumptionFunction,
+|};
+
+export function makeConfigAPI<SideChannel: Context.SimpleConfig>(
+  cache: CacheConfigurator<SideChannel>,
+): ConfigAPI {
   const env: any = value =>
     cache.using(data => {
       if (typeof value === "undefined") return data.envName;
@@ -59,6 +77,26 @@ export default function makeAPI(
     caller,
     assertVersion,
   };
+}
+
+export function makePresetAPI<SideChannel: Context.SimplePreset>(
+  cache: CacheConfigurator<SideChannel>,
+): PresetAPI {
+  const targets = () =>
+    // We are using JSON.parse/JSON.stringify because it's only possible to cache
+    // primitive values. We can safely stringify the targets object because it
+    // only contains strings as its properties.
+    // Please make the Record and Tuple proposal happen!
+    JSON.parse(cache.using(data => JSON.stringify(data.targets)));
+  return { ...makeConfigAPI(cache), targets };
+}
+
+export function makePluginAPI<SideChannel: Context.SimplePlugin>(
+  cache: CacheConfigurator<SideChannel>,
+): PluginAPI {
+  const assumption = name => cache.using(data => data.assumptions[name]);
+
+  return { ...makePresetAPI(cache), assumption };
 }
 
 function assertVersion(range: string | number): void {

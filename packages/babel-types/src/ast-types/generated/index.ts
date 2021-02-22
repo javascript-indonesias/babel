@@ -182,6 +182,7 @@ export type Node =
   | Method
   | MixedTypeAnnotation
   | ModuleDeclaration
+  | ModuleExpression
   | ModuleSpecifier
   | NewExpression
   | Noop
@@ -1118,6 +1119,7 @@ export interface FunctionTypeAnnotation extends BaseNode {
   params: Array<FunctionTypeParam>;
   rest?: FunctionTypeParam | null;
   returnType: FlowType;
+  this?: FunctionTypeParam | null;
 }
 
 export interface FunctionTypeParam extends BaseNode {
@@ -1338,23 +1340,27 @@ export interface EnumBooleanBody extends BaseNode {
   type: "EnumBooleanBody";
   members: Array<EnumBooleanMember>;
   explicitType: boolean;
+  hasUnknownMembers: boolean;
 }
 
 export interface EnumNumberBody extends BaseNode {
   type: "EnumNumberBody";
   members: Array<EnumNumberMember>;
   explicitType: boolean;
+  hasUnknownMembers: boolean;
 }
 
 export interface EnumStringBody extends BaseNode {
   type: "EnumStringBody";
   members: Array<EnumStringMember | EnumDefaultedMember>;
   explicitType: boolean;
+  hasUnknownMembers: boolean;
 }
 
 export interface EnumSymbolBody extends BaseNode {
   type: "EnumSymbolBody";
   members: Array<EnumDefaultedMember>;
+  hasUnknownMembers: boolean;
 }
 
 export interface EnumBooleanMember extends BaseNode {
@@ -1616,6 +1622,11 @@ export interface StaticBlock extends BaseNode {
   body: Array<Statement>;
 }
 
+export interface ModuleExpression extends BaseNode {
+  type: "ModuleExpression";
+  body: Program;
+}
+
 export interface TSParameterProperty extends BaseNode {
   type: "TSParameterProperty";
   parameter: Identifier | AssignmentPattern;
@@ -1767,6 +1778,7 @@ export interface TSConstructorType extends BaseNode {
   typeParameters?: TSTypeParameterDeclaration | null;
   parameters: Array<Identifier | RestElement>;
   typeAnnotation?: TSTypeAnnotation | null;
+  abstract?: boolean | null;
 }
 
 export interface TSTypeReference extends BaseNode {
@@ -2040,6 +2052,7 @@ export type Expression =
   | RecordExpression
   | TupleExpression
   | DecimalLiteral
+  | ModuleExpression
   | TSAsExpression
   | TSTypeAssertion
   | TSNonNullExpression;

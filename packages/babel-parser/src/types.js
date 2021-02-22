@@ -655,6 +655,11 @@ export type TemplateElement = NodeBase & {
   },
 };
 
+export type ModuleExpression = NodeBase & {
+  type: "ModuleExpression",
+  body: Program,
+};
+
 // Patterns
 
 // TypeScript access modifiers
@@ -1072,6 +1077,19 @@ export type EstreeImportExpression = NodeBase & {
   source: Expression,
 };
 
+export type EstreePrivateIdentifier = NodeBase & {
+  type: "PrivateIdentifier",
+  name: string,
+};
+
+export type EstreePropertyDefinition = NodeBase & {
+  type: "PropertyDefinition",
+  static: boolean,
+  key: Expression | EstreePrivateIdentifier,
+  computed: boolean,
+  value: Expression,
+};
+
 // === === === ===
 // TypeScript
 // === === === ===
@@ -1250,6 +1268,7 @@ export type TsConstructorType = TsTypeBase &
   TsSignatureDeclarationBase & {
     type: "TSConstructorType",
     typeAnnotation: TsTypeAnnotation,
+    abstract: boolean,
   };
 
 export type TsTypeReference = TsTypeBase & {

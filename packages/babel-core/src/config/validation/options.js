@@ -1,5 +1,7 @@
 // @flow
 
+import type { InputTargets, Targets } from "@babel/helper-compilation-targets";
+
 import type { ConfigItem } from "../item";
 import Plugin from "../plugin";
 
@@ -23,9 +25,11 @@ import {
   assertSourceMaps,
   assertCompact,
   assertSourceType,
+  assertTargets,
   type ValidatorSet,
   type Validator,
   type OptionPath,
+  assertAssumptions,
 } from "./option-assertions";
 import type { UnloadedDescriptor } from "../config-descriptors";
 
@@ -77,6 +81,16 @@ const NONPRESET_VALIDATORS: ValidatorSet = {
     $PropertyType<ValidatedOptions, "ignore">,
   >),
   only: (assertIgnoreList: Validator<$PropertyType<ValidatedOptions, "only">>),
+
+  targets: (assertTargets: Validator<
+    $PropertyType<ValidatedOptions, "targets">,
+  >),
+  browserslistConfigFile: (assertConfigFileSearch: Validator<
+    $PropertyType<ValidatedOptions, "browserslistConfigFile">,
+  >),
+  browserslistEnv: (assertString: Validator<
+    $PropertyType<ValidatedOptions, "browserslistEnv">,
+  >),
 };
 
 const COMMON_VALIDATORS: ValidatorSet = {
@@ -94,6 +108,9 @@ const COMMON_VALIDATORS: ValidatorSet = {
   >),
   passPerPreset: (assertBoolean: Validator<
     $PropertyType<ValidatedOptions, "passPerPreset">,
+  >),
+  assumptions: (assertAssumptions: Validator<
+    $PropertyType<ValidatedOptions, "assumptions">,
   >),
 
   env: (assertEnvSet: Validator<$PropertyType<ValidatedOptions, "env">>),
@@ -208,6 +225,13 @@ export type ValidatedOptions = {
   plugins?: PluginList,
   passPerPreset?: boolean,
 
+  assumptions?: { [name: string]: boolean },
+
+  // browserslists-related options
+  targets?: TargetsListOrObject,
+  browserslistConfigFile?: ConfigFileSearch,
+  browserslistEnv?: string,
+
   // Options for @babel/generator
   retainLines?: boolean,
   comments?: boolean,
@@ -239,6 +263,11 @@ export type ValidatedOptions = {
   parserOpts?: {},
   // Deprecate top level generatorOpts
   generatorOpts?: {},
+};
+
+export type NormalizedOptions = {
+  ...$Diff<ValidatedOptions, { targets: any }>,
+  +targets: Targets,
 };
 
 export type CallerMetadata = {
@@ -273,6 +302,11 @@ export type CompactOption = boolean | "auto";
 export type RootInputSourceMapOption = {} | boolean;
 export type RootMode = "root" | "upward" | "upward-optional";
 
+export type TargetsListOrObject =
+  | Targets
+  | InputTargets
+  | $PropertyType<InputTargets, "browsers">;
+
 export type OptionsSource =
   | "arguments"
   | "configfile"
@@ -296,6 +330,29 @@ type EnvPath = $ReadOnly<{
   parent: RootPath | OverridesPath,
 }>;
 export type NestingPath = RootPath | OverridesPath | EnvPath;
+
+export const assumptionsNames = new Set<string>([
+  "arrayLikeIsIterable",
+  "constantReexports",
+  "constantSuper",
+  "enumerableModuleMeta",
+  "ignoreFunctionLength",
+  "ignoreToPrimitiveHint",
+  "iterableIsArray",
+  "mutableTemplateObject",
+  "noClassCalls",
+  "noDocumentAll",
+  "noNewArrows",
+  "objectRestNoSymbols",
+  "privateFieldsAsProperties",
+  "pureGetters",
+  "setClassMethods",
+  "setComputedProperties",
+  "setPublicClassFields",
+  "setSpreadProperties",
+  "skipForOfIteratorClosing",
+  "superIsCallableConstructor",
+]);
 
 function getSource(loc: NestingPath): OptionsSource {
   return loc.type === "root" ? loc.source : getSource(loc.parent);

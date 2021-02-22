@@ -56,7 +56,7 @@ export function DeclareFunction(
   this.word("function");
   this.space();
   this.print(node.id, node);
-  // @ts-expect-error todo(flow->ts) typeAnnotation does not exist on Noop
+  // @ts-ignore TODO(Babel 8) Remove this comment, since we'll remove the Noop node
   this.print(node.id.typeAnnotation.typeAnnotation, node);
 
   if (node.predicate) {
@@ -195,6 +195,10 @@ function enumBody(context: any, node: any) {
     context.print(member, node);
     context.newline();
   }
+  if (node.hasUnknownMembers) {
+    context.token("...");
+    context.newline();
+  }
   context.dedent();
   context.token("}");
 }
@@ -289,6 +293,18 @@ export function FunctionTypeAnnotation(
 ) {
   this.print(node.typeParameters, node);
   this.token("(");
+
+  if (node.this) {
+    this.word("this");
+    this.token(":");
+    this.space();
+    this.print(node.this.typeAnnotation, node);
+    if (node.params.length || node.rest) {
+      this.token(",");
+      this.space();
+    }
+  }
+
   this.printList(node.params, node);
 
   if (node.rest) {

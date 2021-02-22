@@ -13,12 +13,12 @@ import {
 } from "./plugins-compat-data";
 import overlappingPlugins from "@babel/compat-data/overlapping-plugins";
 
-import addCoreJS2UsagePlugin from "./polyfills/corejs2/usage-plugin";
-import addCoreJS3UsagePlugin from "./polyfills/corejs3/usage-plugin";
-import addRegeneratorUsagePlugin from "./polyfills/regenerator/usage-plugin";
-import replaceCoreJS2EntryPlugin from "./polyfills/corejs2/entry-plugin";
-import replaceCoreJS3EntryPlugin from "./polyfills/corejs3/entry-plugin";
-import removeRegeneratorEntryPlugin from "./polyfills/regenerator/entry-plugin";
+import removeRegeneratorEntryPlugin from "./polyfills/regenerator";
+import legacyBabelPolyfillPlugin from "./polyfills/babel-polyfill";
+
+import pluginCoreJS2 from "babel-plugin-polyfill-corejs2";
+import pluginCoreJS3 from "babel-plugin-polyfill-corejs3";
+import pluginRegenerator from "babel-plugin-polyfill-regenerator";
 
 import getTargets, {
   prettifyTargets,
@@ -28,7 +28,6 @@ import getTargets, {
   type InputTargets,
 } from "@babel/helper-compilation-targets";
 import availablePlugins from "./available-plugins";
-import { filterStageFromList } from "./utils";
 import { declare } from "@babel/helper-plugin-utils";
 
 import typeof ModuleTransformationsType from "./module-transformations";
@@ -39,6 +38,19 @@ export function isPluginRequired(targets: Targets, support: Targets) {
   return isRequired("fake-name", targets, {
     compatData: { "fake-name": support },
   });
+}
+
+function filterStageFromList(
+  list: { [feature: string]: Targets },
+  stageList: Set<string>,
+) {
+  return Object.keys(list).reduce((result, item) => {
+    if (!stageList.has(item)) {
+      result[item] = list[item];
+    }
+
+    return result;
+  }, {});
 }
 
 const pluginLists = {
@@ -171,31 +183,46 @@ export const getPolyfillPlugins = ({
   const polyfillPlugins = [];
   if (useBuiltIns === "usage" || useBuiltIns === "entry") {
     const pluginOptions = {
-      corejs,
-      polyfillTargets,
+      method: `${useBuiltIns}-global`,
+      version: corejs ? corejs.toString() : undefined,
+      targets: polyfillTargets,
       include,
       exclude,
       proposals,
       shippedProposals,
-      regenerator,
       debug,
     };
 
     if (corejs) {
       if (useBuiltIns === "usage") {
         if (corejs.major === 2) {
-          polyfillPlugins.push([addCoreJS2UsagePlugin, pluginOptions]);
+          polyfillPlugins.push(
+            [pluginCoreJS2, pluginOptions],
+            [legacyBabelPolyfillPlugin, { usage: true }],
+          );
         } else {
-          polyfillPlugins.push([addCoreJS3UsagePlugin, pluginOptions]);
+          polyfillPlugins.push(
+            [pluginCoreJS3, pluginOptions],
+            [legacyBabelPolyfillPlugin, { usage: true, deprecated: true }],
+          );
         }
         if (regenerator) {
-          polyfillPlugins.push([addRegeneratorUsagePlugin, pluginOptions]);
+          polyfillPlugins.push([
+            pluginRegenerator,
+            { method: "usage-global", debug },
+          ]);
         }
       } else {
         if (corejs.major === 2) {
-          polyfillPlugins.push([replaceCoreJS2EntryPlugin, pluginOptions]);
+          polyfillPlugins.push(
+            [legacyBabelPolyfillPlugin, { regenerator }],
+            [pluginCoreJS2, pluginOptions],
+          );
         } else {
-          polyfillPlugins.push([replaceCoreJS3EntryPlugin, pluginOptions]);
+          polyfillPlugins.push(
+            [pluginCoreJS3, pluginOptions],
+            [legacyBabelPolyfillPlugin, { deprecated: true }],
+          );
           if (!regenerator) {
             polyfillPlugins.push([removeRegeneratorEntryPlugin, pluginOptions]);
           }
@@ -205,6 +232,26 @@ export const getPolyfillPlugins = ({
   }
   return polyfillPlugins;
 };
+
+function getLocalTargets(
+  optionsTargets,
+  ignoreBrowserslistConfig,
+  configPath,
+  browserslistEnv,
+) {
+  if (optionsTargets?.esmodules && optionsTargets.browsers) {
+    console.warn(`
+@babel/preset-env: esmodules and browsers targets have been specified together.
+\`browsers\` target, \`${optionsTargets.browsers.toString()}\` will be ignored.
+`);
+  }
+
+  return getTargets(
+    // $FlowIgnore optionsTargets doesn't have an "uglify" property anymore
+    (optionsTargets: InputTargets),
+    { ignoreBrowserslistConfig, configPath, browserslistEnv },
+  );
+}
 
 function supportsStaticESM(caller) {
   return !!caller?.supportsStaticESM;
@@ -225,6 +272,8 @@ function supportsTopLevelAwait(caller) {
 export default declare((api, opts) => {
   api.assertVersion(7);
 
+  const babelTargets = api.targets();
+
   const {
     bugfixes,
     configPath,
@@ -243,35 +292,38 @@ export default declare((api, opts) => {
     browserslistEnv,
   } = normalizeOptions(opts);
 
-  if (!process.env.BABEL_8_BREAKING) {
-    // eslint-disable-next-line no-var
-    var hasUglifyTarget = false;
+  let targets = babelTargets;
 
-    if (optionsTargets?.uglify) {
-      hasUglifyTarget = true;
-      delete optionsTargets.uglify;
+  if (
+    // If any browserslist-related option is specified, fallback to the old
+    // behavior of not using the targets specified in the top-level options.
+    opts.targets ||
+    opts.configPath ||
+    opts.browserslistEnv ||
+    opts.ignoreBrowserslistConfig
+  ) {
+    if (!process.env.BABEL_8_BREAKING) {
+      // eslint-disable-next-line no-var
+      var hasUglifyTarget = false;
 
-      console.warn(`
+      if (optionsTargets?.uglify) {
+        hasUglifyTarget = true;
+        delete optionsTargets.uglify;
+
+        console.warn(`
 The uglify target has been deprecated. Set the top level
 option \`forceAllTransforms: true\` instead.
 `);
+      }
     }
-  }
 
-  if (optionsTargets?.esmodules && optionsTargets.browsers) {
-    console.warn(`
-@babel/preset-env: esmodules and browsers targets have been specified together.
-\`browsers\` target, \`${optionsTargets.browsers.toString()}\` will be ignored.
-`);
+    targets = getLocalTargets(
+      optionsTargets,
+      ignoreBrowserslistConfig,
+      configPath,
+      browserslistEnv,
+    );
   }
-
-  const targets = getTargets(
-    // $FlowIgnore optionsTargets doesn't have an "uglify" property anymore
-    (optionsTargets: InputTargets),
-    { ignoreBrowserslistConfig, configPath, browserslistEnv },
-  );
-  const include = transformIncludesAndExcludes(optionsInclude);
-  const exclude = transformIncludesAndExcludes(optionsExclude);
 
   const transformTargets = (
     process.env.BABEL_8_BREAKING
@@ -280,6 +332,9 @@ option \`forceAllTransforms: true\` instead.
   )
     ? {}
     : targets;
+
+  const include = transformIncludesAndExcludes(optionsInclude);
+  const exclude = transformIncludesAndExcludes(optionsExclude);
 
   const compatData = getPluginList(shippedProposals, bugfixes);
   const shouldSkipExportNamespaceFrom =
@@ -365,9 +420,6 @@ option \`forceAllTransforms: true\` instead.
       console.log(
         "\nUsing polyfills: No polyfills were added, since the `useBuiltIns` option was not set.",
       );
-    } else {
-      // NOTE: Polyfill plugins are outputting debug info internally
-      console.log(`\nUsing polyfills with \`${useBuiltIns}\` option:`);
     }
   }
 

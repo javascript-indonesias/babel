@@ -39,13 +39,16 @@
   },
   "browser": {
     "./lib/config/files/index.js": "./lib/config/files/index-browser.js",
+    "./lib/config/resolve-targets.js": "./lib/config/resolve-targets-browser.js",
     "./lib/transform-file.js": "./lib/transform-file-browser.js",
     "./src/config/files/index.js": "./src/config/files/index-browser.js",
+    "./src/config/resolve-targets.js": "./src/config/resolve-targets-browser.js",
     "./src/transform-file.js": "./src/transform-file-browser.js"
   },
   "dependencies": {
     "@babel/code-frame": "workspace:^7.12.13",
     "@babel/generator": "workspace:^7.12.17",
+    "@babel/helper-compilation-targets": "workspace:^7.12.17",
     "@babel/helper-module-transforms": "workspace:^7.12.17",
     "@babel/helpers": "workspace:^7.12.17",
     "@babel/parser": "workspace:^7.12.17",
@@ -55,10 +58,10 @@
     "convert-source-map": "^1.7.0",
     "debug": "^4.1.0",
     "escape-string-regexp": "condition:BABEL_8_BREAKING ? ^4.0.0 : ",
-    "gensync": "^1.0.0-beta.1",
+    "gensync": "^1.0.0-beta.2",
     "json5": "^2.1.2",
     "lodash": "^4.17.19",
-    "semver": "^5.4.1",
+    "semver": "condition:BABEL_8_BREAKING ? ^7.3.4 : 7.0.0",
     "source-map": "^0.5.0"
   },
   "devDependencies": {
