@@ -8,14 +8,11 @@ import t from "@babel/types";
 import { fileURLToPath } from "url";
 
 import transformRuntime from "../lib/index.js";
-import buildCorejs2Definitions from "../lib/runtime-corejs2-definitions.js";
-import buildCorejs3Definitions from "../lib/runtime-corejs3-definitions.js";
+import corejs2Definitions from "./runtime-corejs2-definitions.js";
+import corejs3Definitions from "./runtime-corejs3-definitions.js";
 
 const require = createRequire(import.meta.url);
 const runtimeVersion = require("@babel/runtime/package.json").version;
-
-const corejs2Definitions = buildCorejs2Definitions.default();
-const corejs3Definitions = buildCorejs3Definitions.default();
 
 function outputFile(filePath, data) {
   fs.mkdirSync(path.dirname(filePath), { recursive: true });
@@ -119,7 +116,7 @@ function writeHelperFile(
   helperName,
   { esm, corejs }
 ) {
-  const filePath = path.join(helperPath, esm ? "index.mjs" : "index.js");
+  const filePath = path.join(helperPath, esm ? "_index.mjs" : "index.js");
   const fullPath = path.join(pkgDirname, filePath);
 
   outputFile(
@@ -133,7 +130,7 @@ function writeHelperFile(
 function writeHelperLegacyESMFile(pkgDirname, helperName) {
   const fullPath = path.join(pkgDirname, "helpers", "esm", `${helperName}.js`);
 
-  outputFile(fullPath, `export { default } from "../${helperName}/index.mjs"`);
+  outputFile(fullPath, `export { default } from "../${helperName}/_index.mjs"`);
 }
 
 function writeHelpers(runtimeName, { corejs } = {}) {
@@ -230,10 +227,7 @@ function buildHelper(
       ],
     ],
     plugins: [
-      [
-        transformRuntime,
-        { corejs, useESModules: esm, version: runtimeVersion },
-      ],
+      [transformRuntime, { corejs, version: runtimeVersion }],
       buildRuntimeRewritePlugin(runtimeName, helperName),
       esm ? null : addDefaultCJSExport,
     ].filter(Boolean),
@@ -293,15 +287,14 @@ function buildRuntimeRewritePlugin(runtimeName, helperName) {
 function addDefaultCJSExport({ template }) {
   return {
     visitor: {
-      Program: {
+      AssignmentExpression: {
         exit(path) {
-          path.pushContainer(
-            "body",
-            template.statements.ast`
-              module.exports.default = module.exports;
-              module.exports.__esModule = true;
-            `
-          );
+          if (path.get("left").matchesPattern("module.exports")) {
+            path.insertAfter(template.expression.ast`
+              module.exports.default = module.exports,
+              module.exports.__esModule = true
+            `);
+          }
         },
       },
     },

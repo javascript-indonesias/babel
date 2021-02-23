@@ -1,6 +1,6 @@
 {
   "name": "@babel/plugin-proposal-decorators",
-  "version": "7.12.13",
+  "version": "7.13.0",
   "author": "Logan Smyth <loganfsmyth@gmail.com>",
   "license": "MIT",
   "publishConfig": {
@@ -20,8 +20,8 @@
     "decorators"
   ],
   "dependencies": {
-    "@babel/helper-create-class-features-plugin": "workspace:^7.12.13",
-    "@babel/helper-plugin-utils": "workspace:^7.12.13",
+    "@babel/helper-create-class-features-plugin": "workspace:^7.13.0",
+    "@babel/helper-plugin-utils": "workspace:^7.13.0",
     "@babel/plugin-syntax-decorators": "workspace:^7.12.13"
   },
   "peerDependencies": {
@@ -30,7 +30,7 @@
   "devDependencies": {
     "@babel/core": "workspace:*",
     "@babel/helper-plugin-test-runner": "workspace:*",
-    "babel-plugin-polyfill-es-shims": "^0.1.0",
+    "babel-plugin-polyfill-es-shims": "^0.1.1",
     "object.getownpropertydescriptors": "^2.1.1"
   }
 }
