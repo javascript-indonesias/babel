@@ -13,9 +13,15 @@ import assert from "assert";
 import fs from "fs";
 import path from "path";
 import vm from "vm";
-import checkDuplicatedNodes from "babel-check-duplicated-nodes";
 import QuickLRU from "quick-lru";
 import escapeRegExp from "./escape-regexp.cjs";
+import { fileURLToPath } from "url";
+
+import { createRequire } from "module";
+const require = createRequire(import.meta.url);
+
+import _checkDuplicatedNodes from "babel-check-duplicated-nodes";
+const checkDuplicatedNodes = _checkDuplicatedNodes.default;
 
 const EXTERNAL_HELPERS_VERSION = "7.100.0";
 
@@ -41,14 +47,17 @@ function createContext() {
   // global creation in tests, which could cause things to bleed between tests.
   runModuleInTestContext(
     "regenerator-runtime",
-    __filename,
+    fileURLToPath(import.meta.url),
     context,
     moduleCache,
   );
 
   // Populate the "babelHelpers" global with Babel's helper utilities.
   runCacheableScriptInTestContext(
-    path.join(__dirname, "babel-helpers-in-memory.js"),
+    path.join(
+      path.dirname(fileURLToPath(import.meta.url)),
+      "babel-helpers-in-memory.js",
+    ),
     buildExternalHelpers,
     context,
     moduleCache,
@@ -328,7 +337,10 @@ function validateFile(actualCode, expectedLoc, expectedCode) {
 }
 
 function normalizeOutput(code, normalizePathSeparator) {
-  const projectRoot = path.resolve(__dirname, "../../../");
+  const projectRoot = path.resolve(
+    path.dirname(fileURLToPath(import.meta.url)),
+    "../../../",
+  );
   const cwdSymbol = "<CWD>";
   let result = code
     .trim()
