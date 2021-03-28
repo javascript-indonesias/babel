@@ -126,7 +126,7 @@ export default function* loadPrivatePartialConfig(
 
   const options: NormalizedOptions = {
     ...merged,
-    targets: resolveTargets(merged, absoluteRootDir, filename),
+    targets: resolveTargets(merged, absoluteRootDir),
 
     // Tack the passes onto the object itself so that, if this object is
     // passed back to Babel a second time, it will be in the right structure
@@ -139,6 +139,7 @@ export default function* loadPrivatePartialConfig(
     envName: context.envName,
     cwd: context.cwd,
     root: context.root,
+    rootMode: "root",
     filename:
       typeof context.filename === "string" ? context.filename : undefined,
 

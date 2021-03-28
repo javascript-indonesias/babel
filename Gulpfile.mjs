@@ -8,7 +8,6 @@ import through from "through2";
 import chalk from "chalk";
 import newer from "gulp-newer";
 import babel from "gulp-babel";
-import camelCase from "lodash/camelCase.js";
 import fancyLog from "fancy-log";
 import filter from "gulp-filter";
 import revertPath from "gulp-revert-path";
@@ -162,7 +161,9 @@ function generateStandalone() {
         let allList = "";
 
         for (const plugin of pluginConfig) {
-          const camelPlugin = camelCase(plugin);
+          const camelPlugin = plugin.replace(/-[a-z]/g, c =>
+            c[1].toUpperCase()
+          );
           imports += `import ${camelPlugin} from "@babel/plugin-${plugin}";`;
           list += `${camelPlugin},`;
           allList += `"${plugin}": ${camelPlugin},`;
@@ -288,11 +289,18 @@ function buildRollup(packages, targetBrowsers) {
         input,
         external,
         onwarn(warning, warn) {
-          if (warning.code !== "CIRCULAR_DEPENDENCY") {
+          if (warning.code === "CIRCULAR_DEPENDENCY") return;
+          if (warning.code === "UNUSED_EXTERNAL_IMPORT") {
             warn(warning);
-            // https://github.com/babel/babel/pull/12011#discussion_r540434534
-            throw new Error("Rollup aborted due to warnings above");
+            return;
           }
+
+          // We use console.warn here since it prints more info than just "warn",
+          // in case we want to stop throwing for a specific message.
+          console.warn(warning);
+
+          // https://github.com/babel/babel/pull/12011#discussion_r540434534
+          throw new Error("Rollup aborted due to warnings above");
         },
         plugins: [
           rollupBabelSource(),
@@ -424,6 +432,7 @@ function copyDts(packages) {
 const libBundles = [
   "packages/babel-parser",
   "packages/babel-plugin-proposal-optional-chaining",
+  "packages/babel-preset-react",
   "packages/babel-preset-typescript",
   "packages/babel-helper-member-expression-to-functions",
   "packages/babel-plugin-bugfix-v8-spread-parameters-in-optional-chaining",

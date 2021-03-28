@@ -139,14 +139,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@babel/compat-data@workspace:*, @babel/compat-data@workspace:^7.13.8, @babel/compat-data@workspace:packages/babel-compat-data":
+"@babel/compat-data@workspace:*, @babel/compat-data@workspace:^7.13.12, @babel/compat-data@workspace:^7.13.8, @babel/compat-data@workspace:packages/babel-compat-data":
   version: 0.0.0-use.local
   resolution: "@babel/compat-data@workspace:packages/babel-compat-data"
   dependencies:
     "@mdn/browser-compat-data": ^3.1.1
     core-js-compat: ^3.9.0
     electron-to-chromium: 1.3.672
-    lodash: ^4.17.19
   languageName: unknown
   linkType: soft
 
@@ -204,20 +203,18 @@ __metadata:
   dependencies:
     "@babel/code-frame": "workspace:^7.12.13"
     "@babel/generator": "workspace:^7.13.9"
-    "@babel/helper-compilation-targets": "workspace:^7.13.10"
-    "@babel/helper-module-transforms": "workspace:^7.13.0"
+    "@babel/helper-compilation-targets": "workspace:^7.13.13"
+    "@babel/helper-module-transforms": "condition:BABEL_8_BREAKING ? : workspace:^7.13.12"
     "@babel/helper-transform-fixture-test-runner": "workspace:*"
     "@babel/helpers": "workspace:^7.13.10"
-    "@babel/parser": "workspace:^7.13.10"
+    "@babel/parser": "workspace:^7.13.13"
     "@babel/template": "workspace:^7.12.13"
-    "@babel/traverse": "workspace:^7.13.0"
-    "@babel/types": "workspace:^7.13.0"
+    "@babel/traverse": "workspace:^7.13.13"
+    "@babel/types": "workspace:^7.13.13"
     convert-source-map: ^1.7.0
     debug: ^4.1.0
-    escape-string-regexp: "condition:BABEL_8_BREAKING ? ^4.0.0 : "
     gensync: ^1.0.0-beta.2
     json5: ^2.1.2
-    lodash: ^4.17.19
     semver: "condition:BABEL_8_BREAKING ? ^7.3.4 : ^6.3.0"
     source-map: ^0.5.0
   languageName: unknown
@@ -239,7 +236,7 @@ __metadata:
     "@babel/core": "workspace:*"
     dedent: ^0.7.0
     eslint: ^7.5.0
-    eslint-scope: 5.1.0
+    eslint-scope: ^5.1.0
     eslint-visitor-keys: ^1.3.0
     semver: "condition:BABEL_8_BREAKING ? ^7.3.4 : ^6.3.0"
   peerDependencies:
@@ -320,7 +317,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@babel/generator@workspace:*, @babel/generator@workspace:^7.12.13, @babel/generator@workspace:^7.13.0, @babel/generator@workspace:^7.13.9, @babel/generator@workspace:packages/babel-generator":
+"@babel/generator@workspace:*, @babel/generator@workspace:^7.12.13, @babel/generator@workspace:^7.13.9, @babel/generator@workspace:packages/babel-generator":
   version: 0.0.0-use.local
   resolution: "@babel/generator@workspace:packages/babel-generator"
   dependencies:
@@ -413,11 +410,11 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@babel/helper-compilation-targets@workspace:^7.13.10, @babel/helper-compilation-targets@workspace:^7.13.8, @babel/helper-compilation-targets@workspace:packages/babel-helper-compilation-targets":
+"@babel/helper-compilation-targets@workspace:^7.13.10, @babel/helper-compilation-targets@workspace:^7.13.13, @babel/helper-compilation-targets@workspace:^7.13.8, @babel/helper-compilation-targets@workspace:packages/babel-helper-compilation-targets":
   version: 0.0.0-use.local
   resolution: "@babel/helper-compilation-targets@workspace:packages/babel-helper-compilation-targets"
   dependencies:
-    "@babel/compat-data": "workspace:^7.13.8"
+    "@babel/compat-data": "workspace:^7.13.12"
     "@babel/core": "workspace:*"
     "@babel/helper-validator-option": "workspace:^7.12.17"
     browserslist: ^4.14.5
@@ -489,7 +486,7 @@ __metadata:
   resolution: "@babel/helper-define-map@workspace:packages/babel-helper-define-map"
   dependencies:
     "@babel/helper-function-name": "workspace:^7.12.13"
-    "@babel/types": "workspace:^7.12.13"
+    "@babel/types": "workspace:^7.13.12"
   languageName: unknown
   linkType: soft
 
@@ -543,9 +540,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@babel/helper-fixtures@workspace:packages/babel-helper-fixtures"
   dependencies:
-    "@types/lodash": ^4.14.150
     "@types/semver": ^7.3.4
-    lodash: ^4.17.19
     semver: "condition:BABEL_8_BREAKING ? ^7.3.4 : ^6.3.0"
   languageName: unknown
   linkType: soft
@@ -616,12 +611,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@babel/helper-member-expression-to-functions@workspace:^7.13.0, @babel/helper-member-expression-to-functions@workspace:packages/babel-helper-member-expression-to-functions":
+"@babel/helper-member-expression-to-functions@workspace:^7.13.0, @babel/helper-member-expression-to-functions@workspace:^7.13.12, @babel/helper-member-expression-to-functions@workspace:packages/babel-helper-member-expression-to-functions":
   version: 0.0.0-use.local
   resolution: "@babel/helper-member-expression-to-functions@workspace:packages/babel-helper-member-expression-to-functions"
   dependencies:
     "@babel/traverse": "workspace:^7.12.17"
-    "@babel/types": "workspace:^7.13.0"
+    "@babel/types": "workspace:^7.13.12"
   languageName: unknown
   linkType: soft
 
@@ -634,15 +629,39 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@babel/helper-module-imports@workspace:^7.12.13, @babel/helper-module-imports@workspace:packages/babel-helper-module-imports":
+"@babel/helper-module-imports@workspace:^7.12.13, @babel/helper-module-imports@workspace:^7.13.12, @babel/helper-module-imports@workspace:packages/babel-helper-module-imports":
   version: 0.0.0-use.local
   resolution: "@babel/helper-module-imports@workspace:packages/babel-helper-module-imports"
   dependencies:
     "@babel/core": "workspace:*"
     "@babel/traverse": "workspace:*"
-    "@babel/types": "workspace:^7.12.13"
+    "@babel/types": "workspace:^7.13.12"
   languageName: unknown
   linkType: soft
+
+"@babel/helper-module-transforms-BABEL_8_BREAKING-false@npm:@babel/helper-module-transforms@workspace:^7.13.12, @babel/helper-module-transforms@workspace:^7.13.0, @babel/helper-module-transforms@workspace:packages/babel-helper-module-transforms":
+  version: 0.0.0-use.local
+  resolution: "@babel/helper-module-transforms@workspace:packages/babel-helper-module-transforms"
+  dependencies:
+    "@babel/helper-module-imports": "workspace:^7.13.12"
+    "@babel/helper-replace-supers": "workspace:^7.13.12"
+    "@babel/helper-simple-access": "workspace:^7.13.12"
+    "@babel/helper-split-export-declaration": "workspace:^7.12.13"
+    "@babel/helper-validator-identifier": "workspace:^7.12.11"
+    "@babel/template": "workspace:^7.12.13"
+    "@babel/traverse": "workspace:^7.13.0"
+    "@babel/types": "workspace:^7.13.12"
+  languageName: unknown
+  linkType: soft
+
+"@babel/helper-module-transforms@condition:BABEL_8_BREAKING ? : workspace:^7.13.12":
+  version: 0.0.0-condition-130862
+  resolution: "@babel/helper-module-transforms@condition:BABEL_8_BREAKING?:workspace:^7.13.12#130862"
+  dependencies:
+    "@babel/helper-module-transforms-BABEL_8_BREAKING-false": "npm:@babel/helper-module-transforms@workspace:^7.13.12"
+  checksum: 099f985d9558228aa29430a51630015ea02a47f2714cc392f0105921e768c4998a70686942c51defe174cd5ed9f221ab0e4505a611f40e7a68158748c4bbfb8e
+  languageName: node
+  linkType: hard
 
 "@babel/helper-module-transforms@npm:^7.12.1, @babel/helper-module-transforms@npm:^7.12.13, @babel/helper-module-transforms@npm:^7.13.0":
   version: 7.13.0
@@ -660,21 +679,6 @@ __metadata:
   checksum: b7e45c67eeaca488fa7a7bb0afebaec25b91f94cb04d32229ef799bd3a31ef5b566737fefd139b20c6525817528816e43bf492372c77e352e2a0e4d03b1fe21b
   languageName: node
   linkType: hard
-
-"@babel/helper-module-transforms@workspace:^7.13.0, @babel/helper-module-transforms@workspace:packages/babel-helper-module-transforms":
-  version: 0.0.0-use.local
-  resolution: "@babel/helper-module-transforms@workspace:packages/babel-helper-module-transforms"
-  dependencies:
-    "@babel/helper-module-imports": "workspace:^7.12.13"
-    "@babel/helper-replace-supers": "workspace:^7.13.0"
-    "@babel/helper-simple-access": "workspace:^7.12.13"
-    "@babel/helper-split-export-declaration": "workspace:^7.12.13"
-    "@babel/helper-validator-identifier": "workspace:^7.12.11"
-    "@babel/template": "workspace:^7.12.13"
-    "@babel/traverse": "workspace:^7.13.0"
-    "@babel/types": "workspace:^7.13.0"
-  languageName: unknown
-  linkType: soft
 
 "@babel/helper-optimise-call-expression@npm:^7.12.13":
   version: 7.12.13
@@ -750,14 +754,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@babel/helper-replace-supers@workspace:^7.12.13, @babel/helper-replace-supers@workspace:^7.13.0, @babel/helper-replace-supers@workspace:packages/babel-helper-replace-supers":
+"@babel/helper-replace-supers@workspace:^7.12.13, @babel/helper-replace-supers@workspace:^7.13.0, @babel/helper-replace-supers@workspace:^7.13.12, @babel/helper-replace-supers@workspace:packages/babel-helper-replace-supers":
   version: 0.0.0-use.local
   resolution: "@babel/helper-replace-supers@workspace:packages/babel-helper-replace-supers"
   dependencies:
-    "@babel/helper-member-expression-to-functions": "workspace:^7.13.0"
+    "@babel/helper-member-expression-to-functions": "workspace:^7.13.12"
     "@babel/helper-optimise-call-expression": "workspace:^7.12.13"
     "@babel/traverse": "workspace:^7.13.0"
-    "@babel/types": "workspace:^7.13.0"
+    "@babel/types": "workspace:^7.13.12"
   languageName: unknown
   linkType: soft
 
@@ -770,12 +774,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@babel/helper-simple-access@workspace:^7.12.13, @babel/helper-simple-access@workspace:packages/babel-helper-simple-access":
+"@babel/helper-simple-access@workspace:^7.12.13, @babel/helper-simple-access@workspace:^7.13.12, @babel/helper-simple-access@workspace:packages/babel-helper-simple-access":
   version: 0.0.0-use.local
   resolution: "@babel/helper-simple-access@workspace:packages/babel-helper-simple-access"
   dependencies:
     "@babel/traverse": "workspace:^7.12.17"
-    "@babel/types": "workspace:^7.12.13"
+    "@babel/types": "workspace:^7.13.12"
   languageName: unknown
   linkType: soft
 
@@ -823,8 +827,6 @@ __metadata:
     "@babel/helper-fixtures": "workspace:^7.13.10"
     "@types/jest": ^25.2.2
     babel-check-duplicated-nodes: ^1.0.0
-    escape-string-regexp: "condition:BABEL_8_BREAKING ? ^4.0.0 : "
-    lodash: ^4.17.19
     quick-lru: 5.1.0
     regenerator-runtime: ^0.13.7
     source-map: ^0.5.0
@@ -960,7 +962,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@babel/parser@workspace:*, @babel/parser@workspace:^7.12.13, @babel/parser@workspace:^7.13.0, @babel/parser@workspace:^7.13.10, @babel/parser@workspace:packages/babel-parser":
+"@babel/parser@workspace:*, @babel/parser@workspace:^7.12.13, @babel/parser@workspace:^7.13.13, @babel/parser@workspace:packages/babel-parser":
   version: 0.0.0-use.local
   resolution: "@babel/parser@workspace:packages/babel-parser"
   dependencies:
@@ -973,7 +975,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@babel/plugin-bugfix-v8-spread-parameters-in-optional-chaining@workspace:^7.13.8, @babel/plugin-bugfix-v8-spread-parameters-in-optional-chaining@workspace:packages/babel-plugin-bugfix-v8-spread-parameters-in-optional-chaining":
+"@babel/plugin-bugfix-v8-spread-parameters-in-optional-chaining@workspace:^7.13.12, @babel/plugin-bugfix-v8-spread-parameters-in-optional-chaining@workspace:packages/babel-plugin-bugfix-v8-spread-parameters-in-optional-chaining":
   version: 0.0.0-use.local
   resolution: "@babel/plugin-bugfix-v8-spread-parameters-in-optional-chaining@workspace:packages/babel-plugin-bugfix-v8-spread-parameters-in-optional-chaining"
   dependencies:
@@ -981,7 +983,7 @@ __metadata:
     "@babel/helper-plugin-test-runner": "workspace:*"
     "@babel/helper-plugin-utils": "workspace:^7.13.0"
     "@babel/helper-skip-transparent-expression-wrappers": "workspace:^7.12.1"
-    "@babel/plugin-proposal-optional-chaining": "workspace:^7.13.8"
+    "@babel/plugin-proposal-optional-chaining": "workspace:^7.13.12"
     "@babel/traverse": "workspace:*"
   peerDependencies:
     "@babel/core": ^7.13.0
@@ -1379,7 +1381,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@babel/plugin-proposal-optional-chaining@workspace:*, @babel/plugin-proposal-optional-chaining@workspace:^7.13.8, @babel/plugin-proposal-optional-chaining@workspace:packages/babel-plugin-proposal-optional-chaining":
+"@babel/plugin-proposal-optional-chaining@workspace:*, @babel/plugin-proposal-optional-chaining@workspace:^7.13.12, @babel/plugin-proposal-optional-chaining@workspace:packages/babel-plugin-proposal-optional-chaining":
   version: 0.0.0-use.local
   resolution: "@babel/plugin-proposal-optional-chaining@workspace:packages/babel-plugin-proposal-optional-chaining"
   dependencies:
@@ -2170,7 +2172,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@babel/plugin-transform-flow-strip-types@workspace:*, @babel/plugin-transform-flow-strip-types@workspace:^7.12.13, @babel/plugin-transform-flow-strip-types@workspace:packages/babel-plugin-transform-flow-strip-types":
+"@babel/plugin-transform-flow-strip-types@workspace:*, @babel/plugin-transform-flow-strip-types@workspace:^7.13.0, @babel/plugin-transform-flow-strip-types@workspace:packages/babel-plugin-transform-flow-strip-types":
   version: 0.0.0-use.local
   resolution: "@babel/plugin-transform-flow-strip-types@workspace:packages/babel-plugin-transform-flow-strip-types"
   dependencies:
@@ -2577,7 +2579,7 @@ __metadata:
   dependencies:
     "@babel/core": "workspace:*"
     "@babel/helper-plugin-test-runner": "workspace:*"
-    "@babel/helper-plugin-utils": "workspace:^7.12.13"
+    "@babel/helper-plugin-utils": "workspace:^7.13.0"
   peerDependencies:
     "@babel/core": ^7.0.0-0
   languageName: unknown
@@ -2633,7 +2635,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@babel/plugin-transform-react-jsx-development@workspace:*, @babel/plugin-transform-react-jsx-development@workspace:^7.12.12, @babel/plugin-transform-react-jsx-development@workspace:packages/babel-plugin-transform-react-jsx-development":
+"@babel/plugin-transform-react-jsx-development@workspace:*, @babel/plugin-transform-react-jsx-development@workspace:^7.12.17, @babel/plugin-transform-react-jsx-development@workspace:packages/babel-plugin-transform-react-jsx-development":
   version: 0.0.0-use.local
   resolution: "@babel/plugin-transform-react-jsx-development@workspace:packages/babel-plugin-transform-react-jsx-development"
   dependencies:
@@ -2671,17 +2673,17 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@babel/plugin-transform-react-jsx@workspace:*, @babel/plugin-transform-react-jsx@workspace:^7.12.13, @babel/plugin-transform-react-jsx@workspace:^7.12.17, @babel/plugin-transform-react-jsx@workspace:packages/babel-plugin-transform-react-jsx":
+"@babel/plugin-transform-react-jsx@workspace:*, @babel/plugin-transform-react-jsx@workspace:^7.12.17, @babel/plugin-transform-react-jsx@workspace:^7.13.12, @babel/plugin-transform-react-jsx@workspace:packages/babel-plugin-transform-react-jsx":
   version: 0.0.0-use.local
   resolution: "@babel/plugin-transform-react-jsx@workspace:packages/babel-plugin-transform-react-jsx"
   dependencies:
     "@babel/core": "workspace:*"
     "@babel/helper-annotate-as-pure": "workspace:^7.12.13"
-    "@babel/helper-module-imports": "workspace:^7.12.13"
+    "@babel/helper-module-imports": "workspace:^7.13.12"
     "@babel/helper-plugin-test-runner": "workspace:*"
-    "@babel/helper-plugin-utils": "workspace:^7.12.13"
+    "@babel/helper-plugin-utils": "workspace:^7.13.0"
     "@babel/plugin-syntax-jsx": "workspace:^7.12.13"
-    "@babel/types": "workspace:^7.12.17"
+    "@babel/types": "workspace:^7.13.12"
   peerDependencies:
     "@babel/core": ^7.0.0-0
   languageName: unknown
@@ -3076,14 +3078,14 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@babel/preset-env@workspace:packages/babel-preset-env"
   dependencies:
-    "@babel/compat-data": "workspace:^7.13.8"
+    "@babel/compat-data": "workspace:^7.13.12"
     "@babel/core": "workspace:*"
     "@babel/core-7.12": "npm:@babel/core@7.12.9"
     "@babel/helper-compilation-targets": "workspace:^7.13.10"
     "@babel/helper-plugin-test-runner": "workspace:*"
     "@babel/helper-plugin-utils": "workspace:^7.13.0"
     "@babel/helper-validator-option": "workspace:^7.12.17"
-    "@babel/plugin-bugfix-v8-spread-parameters-in-optional-chaining": "workspace:^7.13.8"
+    "@babel/plugin-bugfix-v8-spread-parameters-in-optional-chaining": "workspace:^7.13.12"
     "@babel/plugin-proposal-async-generator-functions": "workspace:^7.13.8"
     "@babel/plugin-proposal-class-properties": "workspace:^7.13.0"
     "@babel/plugin-proposal-dynamic-import": "workspace:^7.13.8"
@@ -3094,7 +3096,7 @@ __metadata:
     "@babel/plugin-proposal-numeric-separator": "workspace:^7.12.13"
     "@babel/plugin-proposal-object-rest-spread": "workspace:^7.13.8"
     "@babel/plugin-proposal-optional-catch-binding": "workspace:^7.13.8"
-    "@babel/plugin-proposal-optional-chaining": "workspace:^7.13.8"
+    "@babel/plugin-proposal-optional-chaining": "workspace:^7.13.12"
     "@babel/plugin-proposal-private-methods": "workspace:^7.13.0"
     "@babel/plugin-proposal-unicode-property-regex": "workspace:^7.12.13"
     "@babel/plugin-syntax-async-generators": ^7.8.4
@@ -3142,7 +3144,7 @@ __metadata:
     "@babel/plugin-transform-unicode-escapes": "workspace:^7.12.13"
     "@babel/plugin-transform-unicode-regex": "workspace:^7.12.13"
     "@babel/preset-modules": ^0.1.4
-    "@babel/types": "workspace:^7.13.0"
+    "@babel/types": "workspace:^7.13.12"
     babel-plugin-polyfill-corejs2: ^0.1.4
     babel-plugin-polyfill-corejs3: ^0.1.3
     babel-plugin-polyfill-regenerator: ^0.1.2
@@ -3171,8 +3173,9 @@ __metadata:
   dependencies:
     "@babel/core": "workspace:*"
     "@babel/helper-plugin-test-runner": "workspace:*"
-    "@babel/helper-plugin-utils": "workspace:^7.12.13"
-    "@babel/plugin-transform-flow-strip-types": "workspace:^7.12.13"
+    "@babel/helper-plugin-utils": "workspace:^7.13.0"
+    "@babel/helper-validator-option": "workspace:^7.12.17"
+    "@babel/plugin-transform-flow-strip-types": "workspace:^7.13.0"
   peerDependencies:
     "@babel/core": ^7.0.0-0
   languageName: unknown
@@ -3199,10 +3202,11 @@ __metadata:
   dependencies:
     "@babel/core": "workspace:*"
     "@babel/helper-plugin-test-runner": "workspace:*"
-    "@babel/helper-plugin-utils": "workspace:^7.12.13"
+    "@babel/helper-plugin-utils": "workspace:^7.13.0"
+    "@babel/helper-validator-option": "workspace:^7.12.17"
     "@babel/plugin-transform-react-display-name": "workspace:^7.12.13"
-    "@babel/plugin-transform-react-jsx": "workspace:^7.12.13"
-    "@babel/plugin-transform-react-jsx-development": "workspace:^7.12.12"
+    "@babel/plugin-transform-react-jsx": "workspace:^7.13.12"
+    "@babel/plugin-transform-react-jsx-development": "workspace:^7.12.17"
     "@babel/plugin-transform-react-pure-annotations": "workspace:^7.12.1"
   peerDependencies:
     "@babel/core": ^7.0.0-0
@@ -3258,7 +3262,6 @@ __metadata:
     "@babel/core": "workspace:*"
     "@babel/plugin-transform-modules-commonjs": "workspace:*"
     browserify: ^16.5.2
-    escape-string-regexp: "condition:BABEL_8_BREAKING ? ^4.0.0 : "
     find-cache-dir: "condition:BABEL_8_BREAKING ? ^3.3.1 : ^2.0.0"
     lodash: ^4.17.19
     make-dir: ^2.1.0
@@ -3458,20 +3461,19 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@babel/traverse@workspace:*, @babel/traverse@workspace:^7.12.17, @babel/traverse@workspace:^7.13.0, @babel/traverse@workspace:packages/babel-traverse":
+"@babel/traverse@workspace:*, @babel/traverse@workspace:^7.12.17, @babel/traverse@workspace:^7.13.0, @babel/traverse@workspace:^7.13.13, @babel/traverse@workspace:packages/babel-traverse":
   version: 0.0.0-use.local
   resolution: "@babel/traverse@workspace:packages/babel-traverse"
   dependencies:
     "@babel/code-frame": "workspace:^7.12.13"
-    "@babel/generator": "workspace:^7.13.0"
+    "@babel/generator": "workspace:^7.13.9"
     "@babel/helper-function-name": "workspace:^7.12.13"
     "@babel/helper-plugin-test-runner": "workspace:*"
     "@babel/helper-split-export-declaration": "workspace:^7.12.13"
-    "@babel/parser": "workspace:^7.13.0"
-    "@babel/types": "workspace:^7.13.0"
+    "@babel/parser": "workspace:^7.13.13"
+    "@babel/types": "workspace:^7.13.13"
     debug: ^4.1.0
     globals: "condition:BABEL_8_BREAKING ? ^13.5.0 : ^11.1.0"
-    lodash: ^4.17.19
   languageName: unknown
   linkType: soft
 
@@ -3486,7 +3488,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@babel/types@workspace:*, @babel/types@workspace:^7.12.1, @babel/types@workspace:^7.12.13, @babel/types@workspace:^7.12.17, @babel/types@workspace:^7.13.0, @babel/types@workspace:packages/babel-types":
+"@babel/types@workspace:*, @babel/types@workspace:^7.12.1, @babel/types@workspace:^7.12.13, @babel/types@workspace:^7.13.0, @babel/types@workspace:^7.13.12, @babel/types@workspace:^7.13.13, @babel/types@workspace:packages/babel-types":
   version: 0.0.0-use.local
   resolution: "@babel/types@workspace:packages/babel-types"
   dependencies:
@@ -7431,22 +7433,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"escape-string-regexp-BABEL_8_BREAKING-true@npm:escape-string-regexp@^4.0.0":
-  version: 4.0.0
-  resolution: "escape-string-regexp@npm:4.0.0"
-  checksum: c747be8d5ff7873127e3e0cffe7d2206a37208077fa9c30a3c1bb4f26bebd081c8c24d5fba7a99449f9d20670bea3dc5e1b6098b0f074b099bd38766271a272f
-  languageName: node
-  linkType: hard
-
-"escape-string-regexp@condition:BABEL_8_BREAKING ? ^4.0.0 : ":
-  version: 0.0.0-condition-d458a5
-  resolution: "escape-string-regexp@condition:BABEL_8_BREAKING?^4.0.0:#d458a5"
-  dependencies:
-    escape-string-regexp-BABEL_8_BREAKING-true: "npm:escape-string-regexp@^4.0.0"
-  checksum: a67cb3a0fc219d92f2c6f0964e302cc079b0ce38bf2bd19257d26865c600bec42befed4dc88aec2bfbe9e62f757ce4bec80a408937bf48c5c779e13d9b238c01
-  languageName: node
-  linkType: hard
-
 "escape-string-regexp@npm:^1.0.2, escape-string-regexp@npm:^1.0.5":
   version: 1.0.5
   resolution: "escape-string-regexp@npm:1.0.5"
@@ -7573,16 +7559,6 @@ __metadata:
   version: 0.3.0
   resolution: "eslint-rule-composer@npm:0.3.0"
   checksum: eb96fffa4eb2cc40061bf082bb4cc48df746e9c556e4b20c653e1b84b34cabd66462bafad124d44ea2b89a750a2aec26c21507bd7b8b23f355136a8901e09d00
-  languageName: node
-  linkType: hard
-
-"eslint-scope@npm:5.1.0":
-  version: 5.1.0
-  resolution: "eslint-scope@npm:5.1.0"
-  dependencies:
-    esrecurse: ^4.1.0
-    estraverse: ^4.1.1
-  checksum: 4a0e97979a855d09c4bb3a3f4f945cefaf8f6638a6a8f49472cefb0cf64982ab7ed1683a1e63d20ce1bcb01f94c133dc7a5bdf03b28eb945999f50f08878a2b4
   languageName: node
   linkType: hard
 
