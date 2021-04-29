@@ -3,7 +3,7 @@
 import * as N from "../types";
 import { types as tt, type TokenType } from "../tokenizer/types";
 import ExpressionParser from "./expression";
-import { Errors } from "./error";
+import { Errors, SourceTypeModuleErrors } from "./error";
 import {
   isIdentifierChar,
   isIdentifierStart,
@@ -324,13 +324,7 @@ export default class StatementParser extends ExpressionParser {
 
   assertModuleNodeAllowed(node: N.Node): void {
     if (!this.options.allowImportExportEverywhere && !this.inModule) {
-      this.raiseWithData(
-        node.start,
-        {
-          code: "BABEL_PARSER_SOURCETYPE_MODULE_REQUIRED",
-        },
-        Errors.ImportOutsideModule,
-      );
+      this.raise(node.start, SourceTypeModuleErrors.ImportOutsideModule);
     }
   }
 
@@ -1211,15 +1205,12 @@ export default class StatementParser extends ExpressionParser {
   }
 
   // https://tc39.es/ecma262/#prod-ClassBody
-  parseClassBody(
-    constructorAllowsSuper: boolean,
-    oldStrict: boolean,
-  ): N.ClassBody {
+  parseClassBody(hadSuperClass: boolean, oldStrict: boolean): N.ClassBody {
     this.classScope.enter();
 
     const state: N.ParseClassMemberState = {
-      constructorAllowsSuper,
       hadConstructor: false,
+      hadSuperClass,
     };
     let decorators: N.Decorator[] = [];
     const classBody: N.ClassBody = this.startNode();
@@ -1406,8 +1397,11 @@ export default class StatementParser extends ExpressionParser {
         if (state.hadConstructor && !this.hasPlugin("typescript")) {
           this.raise(key.start, Errors.DuplicateConstructor);
         }
+        if (isConstructor && this.hasPlugin("typescript") && member.override) {
+          this.raise(key.start, Errors.OverrideOnConstructor);
+        }
         state.hadConstructor = true;
-        allowsDirectSuper = state.constructorAllowsSuper;
+        allowsDirectSuper = state.hadSuperClass;
       }
 
       this.pushClassMethod(
@@ -1570,8 +1564,6 @@ export default class StatementParser extends ExpressionParser {
     classBody: N.ClassBody,
     prop: N.ClassPrivateProperty,
   ) {
-    this.expectPlugin("classPrivateProperties", prop.key.start);
-
     const node = this.parseClassPrivateProperty(prop);
     classBody.body.push(node);
 
@@ -1609,8 +1601,6 @@ export default class StatementParser extends ExpressionParser {
     isGenerator: boolean,
     isAsync: boolean,
   ): void {
-    this.expectPlugin("classPrivateMethods", method.key.start);
-
     const node = this.parseMethod(
       method,
       isGenerator,
@@ -1656,9 +1646,6 @@ export default class StatementParser extends ExpressionParser {
 
   // https://tc39.es/proposal-class-fields/#prod-FieldDefinition
   parseClassProperty(node: N.ClassProperty): N.ClassProperty {
-    if (!node.typeAnnotation || this.match(tt.eq)) {
-      this.expectPlugin("classProperties");
-    }
     this.parseInitializer(node);
     this.semicolon();
     return this.finishNode(node, "ClassProperty");
@@ -2102,7 +2089,6 @@ export default class StatementParser extends ExpressionParser {
   // https://tc39.es/ecma262/#prod-ModuleExportName
   parseModuleExportName(): N.StringLiteral | N.Identifier {
     if (this.match(tt.string)) {
-      this.expectPlugin("moduleStringNames");
       const result = this.parseLiteral<N.StringLiteral>(
         this.state.value,
         "StringLiteral",
@@ -2389,5 +2375,13 @@ export default class StatementParser extends ExpressionParser {
     }
     this.checkLVal(specifier.local, "import specifier", BIND_LEXICAL);
     node.specifiers.push(this.finishNode(specifier, "ImportSpecifier"));
+  }
+
+  // This is used in flow and typescript plugin
+  // Determine whether a parameter is a this param
+  isThisParam(
+    param: N.Pattern | N.Identifier | N.TSParameterProperty,
+  ): boolean {
+    return param.type === "Identifier" && param.name === "this";
   }
 }

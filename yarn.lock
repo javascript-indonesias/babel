@@ -427,6 +427,7 @@ __metadata:
   resolution: "@babel/helper-create-class-features-plugin@workspace:packages/babel-helper-create-class-features-plugin"
   dependencies:
     "@babel/core": "workspace:*"
+    "@babel/helper-annotate-as-pure": "workspace:^7.12.13"
     "@babel/helper-function-name": "workspace:^7.12.13"
     "@babel/helper-member-expression-to-functions": "workspace:^7.13.0"
     "@babel/helper-optimise-call-expression": "workspace:^7.12.13"
@@ -805,6 +806,13 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@babel/helper-validator-identifier-baseline@npm:@babel/helper-validator-identifier@7.10.4":
+  version: 7.10.4
+  resolution: "@babel/helper-validator-identifier@npm:7.10.4"
+  checksum: 25098ef842e3ffecdd9a7216f6173da7ad7be1b0b3e454a9f6965055154b9ad7a4acd2f218ba3d2efc0821bdab97837b3cb815844af7d72f66f89d446a54efc6
+  languageName: node
+  linkType: hard
+
 "@babel/helper-validator-identifier@npm:^7.12.11":
   version: 7.12.11
   resolution: "@babel/helper-validator-identifier@npm:7.12.11"
@@ -816,8 +824,10 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@babel/helper-validator-identifier@workspace:packages/babel-helper-validator-identifier"
   dependencies:
+    "@babel/helper-validator-identifier-baseline": "npm:@babel/helper-validator-identifier@7.10.4"
+    "@unicode/unicode-13.0.0": ^1.0.6
+    benchmark: ^2.1.4
     charcodes: ^0.2.0
-    unicode-13.0.0: ^0.8.0
   languageName: unknown
   linkType: soft
 
@@ -1011,6 +1021,22 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@babel/plugin-proposal-async-do-expressions@workspace:packages/babel-plugin-proposal-async-do-expressions":
+  version: 0.0.0-use.local
+  resolution: "@babel/plugin-proposal-async-do-expressions@workspace:packages/babel-plugin-proposal-async-do-expressions"
+  dependencies:
+    "@babel/core": "workspace:*"
+    "@babel/helper-hoist-variables": "workspace:^7.13.0"
+    "@babel/helper-plugin-test-runner": "workspace:*"
+    "@babel/helper-plugin-utils": "workspace:^7.13.0"
+    "@babel/plugin-syntax-async-do-expressions": "workspace:^7.13.0"
+    "@babel/traverse": "workspace:*"
+    "@babel/types": "workspace:*"
+  peerDependencies:
+    "@babel/core": ^7.13.0
+  languageName: unknown
+  linkType: soft
+
 "@babel/plugin-proposal-async-generator-functions@npm:^7.13.15":
   version: 7.13.15
   resolution: "@babel/plugin-proposal-async-generator-functions@npm:7.13.15"
@@ -1065,7 +1091,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@babel/plugin-proposal-class-static-block@workspace:*, @babel/plugin-proposal-class-static-block@workspace:packages/babel-plugin-proposal-class-static-block":
+"@babel/plugin-proposal-class-static-block@workspace:*, @babel/plugin-proposal-class-static-block@workspace:^7.13.11, @babel/plugin-proposal-class-static-block@workspace:packages/babel-plugin-proposal-class-static-block":
   version: 0.0.0-use.local
   resolution: "@babel/plugin-proposal-class-static-block@workspace:packages/babel-plugin-proposal-class-static-block"
   dependencies:
@@ -1434,14 +1460,16 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@babel/plugin-proposal-private-property-in-object@workspace:*, @babel/plugin-proposal-private-property-in-object@workspace:packages/babel-plugin-proposal-private-property-in-object":
+"@babel/plugin-proposal-private-property-in-object@workspace:*, @babel/plugin-proposal-private-property-in-object@workspace:^7.13.0, @babel/plugin-proposal-private-property-in-object@workspace:packages/babel-plugin-proposal-private-property-in-object":
   version: 0.0.0-use.local
   resolution: "@babel/plugin-proposal-private-property-in-object@workspace:packages/babel-plugin-proposal-private-property-in-object"
   dependencies:
     "@babel/core": "workspace:*"
+    "@babel/helper-annotate-as-pure": "workspace:^7.12.13"
     "@babel/helper-create-class-features-plugin": "workspace:^7.13.0"
     "@babel/helper-plugin-test-runner": "workspace:*"
     "@babel/helper-plugin-utils": "workspace:^7.13.0"
+    "@babel/plugin-syntax-private-property-in-object": "workspace:^7.13.0"
   peerDependencies:
     "@babel/core": ^7.0.0-0
   languageName: unknown
@@ -1494,6 +1522,17 @@ __metadata:
     "@babel/core": "workspace:*"
     "@babel/helper-create-regexp-features-plugin": "workspace:^7.12.13"
     "@babel/helper-plugin-test-runner": "workspace:*"
+    "@babel/helper-plugin-utils": "workspace:^7.12.13"
+  peerDependencies:
+    "@babel/core": ^7.0.0-0
+  languageName: unknown
+  linkType: soft
+
+"@babel/plugin-syntax-async-do-expressions@workspace:^7.13.0, @babel/plugin-syntax-async-do-expressions@workspace:packages/babel-plugin-syntax-async-do-expressions":
+  version: 0.0.0-use.local
+  resolution: "@babel/plugin-syntax-async-do-expressions@workspace:packages/babel-plugin-syntax-async-do-expressions"
+  dependencies:
+    "@babel/core": "workspace:*"
     "@babel/helper-plugin-utils": "workspace:^7.12.13"
   peerDependencies:
     "@babel/core": ^7.0.0-0
@@ -1810,6 +1849,16 @@ __metadata:
   resolution: "@babel/plugin-syntax-pipeline-operator@workspace:packages/babel-plugin-syntax-pipeline-operator"
   dependencies:
     "@babel/core": "workspace:*"
+    "@babel/helper-plugin-utils": "workspace:^7.12.13"
+  peerDependencies:
+    "@babel/core": ^7.0.0-0
+  languageName: unknown
+  linkType: soft
+
+"@babel/plugin-syntax-private-property-in-object@workspace:^7.13.0, @babel/plugin-syntax-private-property-in-object@workspace:packages/babel-plugin-syntax-private-property-in-object":
+  version: 0.0.0-use.local
+  resolution: "@babel/plugin-syntax-private-property-in-object@workspace:packages/babel-plugin-syntax-private-property-in-object"
+  dependencies:
     "@babel/helper-plugin-utils": "workspace:^7.12.13"
   peerDependencies:
     "@babel/core": ^7.0.0-0
@@ -2311,6 +2360,7 @@ __metadata:
     "@babel/helper-module-transforms": "workspace:^7.13.0"
     "@babel/helper-plugin-test-runner": "workspace:*"
     "@babel/helper-plugin-utils": "workspace:^7.13.0"
+    "@babel/plugin-external-helpers": "workspace:*"
     babel-plugin-dynamic-import-node: ^2.3.3
   peerDependencies:
     "@babel/core": ^7.0.0-0
@@ -2340,6 +2390,7 @@ __metadata:
     "@babel/helper-plugin-test-runner": "workspace:*"
     "@babel/helper-plugin-utils": "workspace:^7.13.0"
     "@babel/helper-simple-access": "workspace:^7.12.13"
+    "@babel/plugin-external-helpers": "workspace:*"
     "@babel/plugin-syntax-object-rest-spread": ^7.8.3
     babel-plugin-dynamic-import-node: ^2.3.3
   peerDependencies:
@@ -2399,6 +2450,7 @@ __metadata:
     "@babel/helper-module-transforms": "workspace:^7.13.0"
     "@babel/helper-plugin-test-runner": "workspace:*"
     "@babel/helper-plugin-utils": "workspace:^7.13.0"
+    "@babel/plugin-external-helpers": "workspace:*"
   peerDependencies:
     "@babel/core": ^7.0.0-0
   languageName: unknown
@@ -3076,6 +3128,7 @@ __metadata:
     "@babel/plugin-bugfix-v8-spread-parameters-in-optional-chaining": "workspace:^7.13.12"
     "@babel/plugin-proposal-async-generator-functions": "workspace:^7.13.15"
     "@babel/plugin-proposal-class-properties": "workspace:^7.13.0"
+    "@babel/plugin-proposal-class-static-block": "workspace:^7.13.11"
     "@babel/plugin-proposal-dynamic-import": "workspace:^7.13.8"
     "@babel/plugin-proposal-export-namespace-from": "workspace:^7.12.13"
     "@babel/plugin-proposal-json-strings": "workspace:^7.13.8"
@@ -3086,9 +3139,11 @@ __metadata:
     "@babel/plugin-proposal-optional-catch-binding": "workspace:^7.13.8"
     "@babel/plugin-proposal-optional-chaining": "workspace:^7.13.12"
     "@babel/plugin-proposal-private-methods": "workspace:^7.13.0"
+    "@babel/plugin-proposal-private-property-in-object": "workspace:^7.13.0"
     "@babel/plugin-proposal-unicode-property-regex": "workspace:^7.12.13"
     "@babel/plugin-syntax-async-generators": ^7.8.4
     "@babel/plugin-syntax-class-properties": "workspace:^7.12.13"
+    "@babel/plugin-syntax-class-static-block": "workspace:^7.12.13"
     "@babel/plugin-syntax-dynamic-import": ^7.8.3
     "@babel/plugin-syntax-export-namespace-from": ^7.8.3
     "@babel/plugin-syntax-json-strings": ^7.8.3
@@ -3098,6 +3153,7 @@ __metadata:
     "@babel/plugin-syntax-object-rest-spread": ^7.8.3
     "@babel/plugin-syntax-optional-catch-binding": ^7.8.3
     "@babel/plugin-syntax-optional-chaining": ^7.8.3
+    "@babel/plugin-syntax-private-property-in-object": "workspace:^7.13.0"
     "@babel/plugin-syntax-top-level-await": "workspace:^7.12.13"
     "@babel/plugin-transform-arrow-functions": "workspace:^7.13.0"
     "@babel/plugin-transform-async-to-generator": "workspace:^7.13.0"
@@ -4322,6 +4378,13 @@ __metadata:
     "@typescript-eslint/types": 4.18.0
     eslint-visitor-keys: ^2.0.0
   checksum: 654576d330531386773facffc715e213602721de8ca2f6268d71186a732975031954119fba414a4d502b4827b3941fae068ebb4368b4b7f94e937597b3f57d82
+  languageName: node
+  linkType: hard
+
+"@unicode/unicode-13.0.0@npm:^1.0.6":
+  version: 1.0.6
+  resolution: "@unicode/unicode-13.0.0@npm:1.0.6"
+  checksum: 8971f6f8d302b4cb7e95db6225f4482301b21981c95062209851f1ebc93c392bbf5861029a8f761a857193fb10453cd4043ae376d15a52aed46fd1ada56825d9
   languageName: node
   linkType: hard
 
@@ -5620,6 +5683,16 @@ __metadata:
   dependencies:
     tweetnacl: ^0.14.3
   checksum: 3f57eb99bbc02352f68ff31e446997f4d21cc9a5e5286449dc1fe0116ec5dac5a4aa538967d45714fa9320312d2be8d16126f2d357da1dd40a3d546b96e097ed
+  languageName: node
+  linkType: hard
+
+"benchmark@npm:^2.1.4":
+  version: 2.1.4
+  resolution: "benchmark@npm:2.1.4"
+  dependencies:
+    lodash: ^4.17.4
+    platform: ^1.3.3
+  checksum: 3d3d8f4771b7f9b17f1a967b8f5e70319930fcec2691b35418062342bfbbd1a3221b3129aaf5938fc6a85703837f8cdf2f6875349c158c5aa574b6eb36ab6baa
   languageName: node
   linkType: hard
 
@@ -10838,10 +10911,10 @@ fsevents@^1.2.7:
   languageName: node
   linkType: hard
 
-"lodash@npm:^4.17.14, lodash@npm:^4.17.15, lodash@npm:^4.17.19, lodash@npm:^4.17.20":
-  version: 4.17.20
-  resolution: "lodash@npm:4.17.20"
-  checksum: c62101d2500c383b5f174a7e9e6fe8098149ddd6e9ccfa85f36d4789446195f5c4afd3cfba433026bcaf3da271256566b04a2bf2618e5a39f6e67f8c12030cb6
+"lodash@npm:^4.17.14, lodash@npm:^4.17.15, lodash@npm:^4.17.19, lodash@npm:^4.17.20, lodash@npm:^4.17.4":
+  version: 4.17.21
+  resolution: "lodash@npm:4.17.21"
+  checksum: 4983720b9abca930a4a46f18db163d7dad8dd00dbed6db0cc7b499b33b717cce69f80928b27bbb1ff2cbd3b19d251ee90669a8b5ea466072ca81c2ebe91e7468
   languageName: node
   linkType: hard
 
@@ -12228,6 +12301,13 @@ fsevents@^1.2.7:
   languageName: node
   linkType: hard
 
+"platform@npm:^1.3.3":
+  version: 1.3.6
+  resolution: "platform@npm:1.3.6"
+  checksum: d4d10d5a55476c6d369b03e02b31df50a4e7f1c565efabe707379b8a119709fb2a66dec090ab7fe520a30b767fe3791e3c4a5aba985918e51a17df45e469189f
+  languageName: node
+  linkType: hard
+
 "please-upgrade-node@npm:^3.1.1, please-upgrade-node@npm:^3.2.0":
   version: 3.2.0
   resolution: "please-upgrade-node@npm:3.2.0"
@@ -12673,9 +12753,9 @@ fsevents@^1.2.7:
   linkType: hard
 
 "regenerate@npm:^1.4.0":
-  version: 1.4.0
-  resolution: "regenerate@npm:1.4.0"
-  checksum: d797b035730c0b5cbb7c230220b6a34610f84c1ea2369f0025292613c1ec88068cd87819fccf9c08f002670f26d59e63bbc309358181a6186f7fda185e93618a
+  version: 1.4.2
+  resolution: "regenerate@npm:1.4.2"
+  checksum: 54275a99effd8a439bcdd88942b61f68a769133df841e90d94df9ae7c250cb6537c0a28dd913116539772b3415edbcb3c8d81c22275595d3755cf0353976dfa4
   languageName: node
   linkType: hard
 
@@ -14641,13 +14721,6 @@ typescript@~4.2.3:
     object.reduce: ^1.0.0
     undertaker-registry: ^1.0.0
   checksum: 8fd661579a6a3dfdedb853344f10d4191b1db8e11c7b5ef21a9a9ecf17f4052db58511a4de46391c4f29e6ce6577ec2a2e016dc9d288b834ee756db2e550c406
-  languageName: node
-  linkType: hard
-
-"unicode-13.0.0@npm:^0.8.0":
-  version: 0.8.0
-  resolution: "unicode-13.0.0@npm:0.8.0"
-  checksum: 5a1b05faae6d92b408ba7dadc05ce5eaf6e9695257487b513ec5b67117b717e98c120f768efafb9da7e9d4a880e8f06ad4f1f8ccdf553c071875007a4cfca7b5
   languageName: node
   linkType: hard
 

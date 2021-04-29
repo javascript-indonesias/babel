@@ -82,7 +82,8 @@ export function DoExpression(
   parent: any,
   printStack: Array<any>,
 ): boolean {
-  return isFirstInStatement(printStack);
+  // `async do` can start an expression statement
+  return !node.async && isFirstInStatement(printStack);
 }
 
 export function Binary(node: any, parent: any): boolean {
@@ -134,6 +135,10 @@ export function UnionTypeAnnotation(node: any, parent: any): boolean {
 }
 
 export { UnionTypeAnnotation as IntersectionTypeAnnotation };
+
+export function OptionalIndexedAccessType(node: any, parent: any): boolean {
+  return t.isIndexedAccessType(parent, { objectType: node });
+}
 
 export function TSAsExpression() {
   return true;

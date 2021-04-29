@@ -3,7 +3,7 @@
 import { SemVer, lt } from "semver";
 import { logPlugin } from "./debug";
 import getOptionSpecificExcludesFor from "./get-option-specific-excludes";
-import { removeUnnecessaryItems } from "./filter-items";
+import { removeUnnecessaryItems, removeUnsupportedItems } from "./filter-items";
 import moduleTransformations from "./module-transformations";
 import normalizeOptions from "./normalize-options";
 import { proposalPlugins, pluginSyntaxMap } from "../data/shipped-proposals";
@@ -374,6 +374,7 @@ option \`forceAllTransforms: true\` instead.
     pluginSyntaxMap,
   );
   removeUnnecessaryItems(pluginNames, overlappingPlugins);
+  removeUnsupportedItems(pluginNames, api.version);
 
   const polyfillPlugins = getPolyfillPlugins({
     useBuiltIns,
@@ -393,8 +394,6 @@ option \`forceAllTransforms: true\` instead.
       if (
         pluginName === "proposal-class-properties" ||
         pluginName === "proposal-private-methods" ||
-        // This is not included in preset-env yet, but let's keep it here so we
-        // don't forget about it in the future.
         pluginName === "proposal-private-property-in-object"
       ) {
         return [

@@ -54,7 +54,7 @@ import {
   newAsyncArrowScope,
   newExpressionScope,
 } from "../util/expression-scope";
-import { Errors } from "./error";
+import { Errors, SourceTypeModuleErrors } from "./error";
 
 /*::
 import type { SourceType } from "../options";
@@ -1033,6 +1033,8 @@ export default class ExpressionParser extends LValParser {
             );
           } else if (this.match(tt.name)) {
             return this.parseAsyncArrowUnaryFunction(id);
+          } else if (this.match(tt._do)) {
+            return this.parseDo(true);
           }
         }
 
@@ -1049,7 +1051,7 @@ export default class ExpressionParser extends LValParser {
       }
 
       case tt._do: {
-        return this.parseDo();
+        return this.parseDo(false);
       }
 
       case tt.regexp: {
@@ -1231,13 +1233,27 @@ export default class ExpressionParser extends LValParser {
   }
 
   // https://github.com/tc39/proposal-do-expressions
-  parseDo(): N.DoExpression {
+  // https://github.com/tc39/proposal-async-do-expressions
+  parseDo(isAsync: boolean): N.DoExpression {
     this.expectPlugin("doExpressions");
+    if (isAsync) {
+      this.expectPlugin("asyncDoExpressions");
+    }
     const node = this.startNode();
+    node.async = isAsync;
     this.next(); // eat `do`
     const oldLabels = this.state.labels;
     this.state.labels = [];
-    node.body = this.parseBlock();
+    if (isAsync) {
+      // AsyncDoExpression :
+      // async [no LineTerminator here] do Block[~Yield, +Await, ~Return]
+      this.prodParam.enter(PARAM_AWAIT);
+      node.body = this.parseBlock();
+      this.prodParam.exit();
+    } else {
+      node.body = this.parseBlock();
+    }
+
     this.state.labels = oldLabels;
     return this.finishNode(node, "DoExpression");
   }
@@ -1283,7 +1299,6 @@ export default class ExpressionParser extends LValParser {
     const isPrivate = this.match(tt.hash);
 
     if (isPrivate) {
-      this.expectOnePlugin(["classPrivateProperties", "classPrivateMethods"]);
       if (!isPrivateNameAllowed) {
         this.raise(this.state.pos, Errors.UnexpectedPrivateField);
       }
@@ -1358,11 +1373,7 @@ export default class ExpressionParser extends LValParser {
 
     if (this.isContextual("meta")) {
       if (!this.inModule) {
-        this.raiseWithData(
-          id.start,
-          { code: "BABEL_PARSER_SOURCETYPE_MODULE_REQUIRED" },
-          Errors.ImportMetaOutsideModule,
-        );
+        this.raise(id.start, SourceTypeModuleErrors.ImportMetaOutsideModule);
       }
       this.sawUnambiguousESM = true;
     }
@@ -1524,15 +1535,7 @@ export default class ExpressionParser extends LValParser {
       const metaProp = this.parseMetaProperty(node, meta, "target");
 
       if (!this.scope.inNonArrowFunction && !this.scope.inClass) {
-        let error = Errors.UnexpectedNewTarget;
-
-        if (this.hasPlugin("classProperties")) {
-          error += " or class properties";
-        }
-
-        /* eslint-disable @babel/development-internal/dry-error-messages */
-        this.raise(metaProp.start, error);
-        /* eslint-enable @babel/development-internal/dry-error-messages */
+        this.raise(metaProp.start, Errors.UnexpectedNewTarget);
       }
 
       return metaProp;
