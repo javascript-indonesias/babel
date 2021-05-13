@@ -1095,6 +1095,7 @@ export type EstreeMethodDefinition = NodeBase & {
 export type EstreeImportExpression = NodeBase & {
   type: "ImportExpression",
   source: Expression,
+  attributes?: Expression | null,
 };
 
 export type EstreePrivateIdentifier = NodeBase & {
@@ -1175,9 +1176,10 @@ export type TsSignatureDeclarationOrIndexSignatureBase = NodeBase & {
   typeAnnotation: ?TsTypeAnnotation,
 };
 
-export type TsSignatureDeclarationBase = TsSignatureDeclarationOrIndexSignatureBase & {
-  typeParameters: ?TsTypeParameterDeclaration,
-};
+export type TsSignatureDeclarationBase =
+  TsSignatureDeclarationOrIndexSignatureBase & {
+    typeParameters: ?TsTypeParameterDeclaration,
+  };
 
 // ================
 // TypeScript type members (for type literal / interface / class)
