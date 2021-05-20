@@ -4,11 +4,7 @@ import * as N from "../types";
 import { types as tt, type TokenType } from "../tokenizer/types";
 import ExpressionParser from "./expression";
 import { Errors, SourceTypeModuleErrors } from "./error";
-import {
-  isIdentifierChar,
-  isIdentifierStart,
-  keywordRelationalOperator,
-} from "../util/identifier";
+import { isIdentifierChar, isIdentifierStart } from "../util/identifier";
 import { lineBreak } from "../util/whitespace";
 import * as charCodes from "charcodes";
 import {
@@ -48,6 +44,8 @@ const FUNC_NO_FLAGS = 0b000,
   FUNC_NULLABLE_ID = 0b100;
 
 const loneSurrogate = /[\uD800-\uDFFF]/u;
+
+const keywordRelationalOperator = /in(?:stanceof)?/y;
 
 /**
  * Convert tt.privateName to tt.hash + tt.name for backward Babel 7 compat.
@@ -183,23 +181,34 @@ export default class StatementParser extends ExpressionParser {
    */
   isLetKeyword(context: ?string): boolean {
     const next = this.nextTokenStart();
-    const nextCh = this.input.charCodeAt(next);
+    const nextCh = this.codePointAtPos(next);
     // For ambiguous cases, determine if a LexicalDeclaration (or only a
     // Statement) is allowed here. If context is not empty then only a Statement
     // is allowed. However, `let [` is an explicit negative lookahead for
     // ExpressionStatement, so special-case it first.
-    if (nextCh === charCodes.leftSquareBracket) return true;
+    // Also, `let \` is never valid as an expression so this must be a keyword.
+    if (
+      nextCh === charCodes.backslash ||
+      nextCh === charCodes.leftSquareBracket
+    ) {
+      return true;
+    }
     if (context) return false;
 
     if (nextCh === charCodes.leftCurlyBrace) return true;
 
     if (isIdentifierStart(nextCh)) {
-      let pos = next + 1;
-      while (isIdentifierChar(this.input.charCodeAt(pos))) {
-        ++pos;
+      keywordRelationalOperator.lastIndex = next;
+      const matched = keywordRelationalOperator.exec(this.input);
+      if (matched !== null) {
+        // We have seen `in` or `instanceof` so far, now check if the identfier
+        // ends here
+        const endCh = this.codePointAtPos(next + matched[0].length);
+        if (!isIdentifierChar(endCh) && endCh !== charCodes.backslash) {
+          return false;
+        }
       }
-      const ident = this.input.slice(next, pos);
-      if (!keywordRelationalOperator.test(ident)) return true;
+      return true;
     }
     return false;
   }
@@ -2032,7 +2041,7 @@ export default class StatementParser extends ExpressionParser {
           // $FlowIgnore
           if (!isFrom && specifier.local) {
             const { local } = specifier;
-            if (local.type === "StringLiteral") {
+            if (local.type !== "Identifier") {
               this.raise(
                 specifier.start,
                 Errors.ExportBindingIsString,
@@ -2148,10 +2157,7 @@ export default class StatementParser extends ExpressionParser {
   // https://tc39.es/ecma262/#prod-ModuleExportName
   parseModuleExportName(): N.StringLiteral | N.Identifier {
     if (this.match(tt.string)) {
-      const result = this.parseLiteral<N.StringLiteral>(
-        this.state.value,
-        "StringLiteral",
-      );
+      const result = this.parseStringLiteral(this.state.value);
       const surrogate = result.value.match(loneSurrogate);
       if (surrogate) {
         this.raise(
@@ -2197,9 +2203,7 @@ export default class StatementParser extends ExpressionParser {
     const assertions = this.maybeParseImportAssertions();
     if (assertions) {
       node.assertions = assertions;
-    }
-    // todo(Babel 8): remove module attributes support
-    else {
+    } else if (!process.env.BABEL_8_BREAKING) {
       const attributes = this.maybeParseModuleAttributes();
       if (attributes) {
         node.attributes = attributes;
@@ -2252,7 +2256,7 @@ export default class StatementParser extends ExpressionParser {
       // parse AssertionKey : IdentifierName, StringLiteral
       const keyName = this.state.value;
       if (this.match(tt.string)) {
-        node.key = this.parseLiteral<N.StringLiteral>(keyName, "StringLiteral");
+        node.key = this.parseStringLiteral(keyName);
       } else {
         node.key = this.parseIdentifier(true);
       }
@@ -2284,10 +2288,7 @@ export default class StatementParser extends ExpressionParser {
           Errors.ModuleAttributeInvalidValue,
         );
       }
-      node.value = this.parseLiteral<N.StringLiteral>(
-        this.state.value,
-        "StringLiteral",
-      );
+      node.value = this.parseStringLiteral(this.state.value);
       this.finishNode<N.ImportAttribute>(node, "ImportAttribute");
       attrs.push(node);
     } while (this.eat(tt.comma));
@@ -2338,7 +2339,7 @@ export default class StatementParser extends ExpressionParser {
           Errors.ModuleAttributeInvalidValue,
         );
       }
-      node.value = this.parseLiteral(this.state.value, "StringLiteral");
+      node.value = this.parseStringLiteral(this.state.value);
       this.finishNode(node, "ImportAttribute");
       attrs.push(node);
     } while (this.eat(tt.comma));
@@ -2417,12 +2418,13 @@ export default class StatementParser extends ExpressionParser {
   // https://tc39.es/ecma262/#prod-ImportSpecifier
   parseImportSpecifier(node: N.ImportDeclaration): void {
     const specifier = this.startNode();
+    const importedIsString = this.match(tt.string);
     specifier.imported = this.parseModuleExportName();
     if (this.eatContextual("as")) {
       specifier.local = this.parseIdentifier();
     } else {
       const { imported } = specifier;
-      if (imported.type === "StringLiteral") {
+      if (importedIsString) {
         throw this.raise(
           specifier.start,
           Errors.ImportBindingIsString,
