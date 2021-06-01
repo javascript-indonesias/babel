@@ -12,7 +12,7 @@
   "publishConfig": {
     "access": "public"
   },
-  "main": "lib/index.js",
+  "main": "./lib/index.js",
   "keywords": [
     "babel-plugin"
   ],
@@ -27,7 +27,11 @@
   "devDependencies": {
     "@babel/core": "workspace:*",
     "@babel/helper-plugin-test-runner": "workspace:*",
-    "babel-plugin-polyfill-corejs3": "^0.2.0",
+    "babel-plugin-polyfill-corejs3": "^0.2.2",
     "core-js-pure": "^3.8.1"
-  }
+  },
+  "engines": {
+    "node": ">=6.9.0"
+  },
+  "author": "The Babel Team (https://babel.dev/team)"
 }
