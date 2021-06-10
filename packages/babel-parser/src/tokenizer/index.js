@@ -12,7 +12,6 @@ import { type TokContext, types as ct } from "./context";
 import ParserErrors, { Errors, type ErrorTemplate } from "../parser/error";
 import { SourceLocation } from "../util/location";
 import {
-  lineBreak,
   lineBreakG,
   isNewLine,
   isWhitespace,
@@ -21,7 +20,15 @@ import {
 import State from "./state";
 import type { LookaheadState } from "./state";
 
-const VALID_REGEX_FLAGS = new Set(["g", "m", "s", "i", "y", "u", "d"]);
+const VALID_REGEX_FLAGS = new Set([
+  charCodes.lowercaseG,
+  charCodes.lowercaseM,
+  charCodes.lowercaseS,
+  charCodes.lowercaseI,
+  charCodes.lowercaseY,
+  charCodes.lowercaseU,
+  charCodes.lowercaseD,
+]);
 
 // The following character codes are forbidden from being
 // an immediate sibling of NumericLiteralSeparator _
@@ -190,7 +197,6 @@ export default class Tokenizer extends ParserErrors {
       end: state.end,
       lastTokEnd: state.end,
       context: [this.curContext()],
-      exprAllowed: state.exprAllowed,
       inType: state.inType,
     };
   }
@@ -486,6 +492,7 @@ export default class Tokenizer extends ParserErrors {
         );
       }
 
+      this.state.pos += 2;
       if (next === charCodes.leftCurlyBrace) {
         // #{
         this.finishToken(tt.braceHashL);
@@ -493,7 +500,6 @@ export default class Tokenizer extends ParserErrors {
         // #[
         this.finishToken(tt.bracketHashL);
       }
-      this.state.pos += 2;
     } else if (isIdentifierStart(next)) {
       ++this.state.pos;
       this.finishToken(tt.privateName, this.readWord1(next));
@@ -525,16 +531,9 @@ export default class Tokenizer extends ParserErrors {
   }
 
   readToken_slash(): void {
-    // '/'
-    if (this.state.exprAllowed && !this.state.inType) {
-      ++this.state.pos;
-      this.readRegexp();
-      return;
-    }
-
     const next = this.input.charCodeAt(this.state.pos + 1);
     if (next === charCodes.equalsTo) {
-      this.finishOp(tt.assign, 2);
+      this.finishOp(tt.slashAssign, 2);
     } else {
       this.finishOp(tt.slash, 1);
     }
@@ -565,7 +564,6 @@ export default class Tokenizer extends ParserErrors {
     let type = code === charCodes.asterisk ? tt.star : tt.modulo;
     let width = 1;
     let next = this.input.charCodeAt(this.state.pos + 1);
-    const exprAllowed = this.state.exprAllowed;
 
     // Exponentiation operator **
     if (code === charCodes.asterisk && next === charCodes.asterisk) {
@@ -574,7 +572,7 @@ export default class Tokenizer extends ParserErrors {
       type = tt.exponent;
     }
 
-    if (next === charCodes.equalsTo && !exprAllowed) {
+    if (next === charCodes.equalsTo && !this.state.inType) {
       width++;
       type = tt.assign;
     }
@@ -615,8 +613,8 @@ export default class Tokenizer extends ParserErrors {
             Errors.RecordExpressionBarIncorrectEndSyntaxType,
           );
         }
-
-        this.finishOp(tt.braceBarR, 2);
+        this.state.pos += 2;
+        this.finishToken(tt.braceBarR);
         return;
       }
 
@@ -631,8 +629,8 @@ export default class Tokenizer extends ParserErrors {
             Errors.TupleExpressionBarIncorrectEndSyntaxType,
           );
         }
-
-        this.finishOp(tt.bracketBarR, 2);
+        this.state.pos += 2;
+        this.finishToken(tt.bracketBarR);
         return;
       }
     }
@@ -812,8 +810,8 @@ export default class Tokenizer extends ParserErrors {
           }
 
           // [|
-          this.finishToken(tt.bracketBarL);
           this.state.pos += 2;
+          this.finishToken(tt.bracketBarL);
         } else {
           ++this.state.pos;
           this.finishToken(tt.bracketL);
@@ -836,8 +834,8 @@ export default class Tokenizer extends ParserErrors {
           }
 
           // {|
-          this.finishToken(tt.braceBarL);
           this.state.pos += 2;
+          this.finishToken(tt.braceBarL);
         } else {
           ++this.state.pos;
           this.finishToken(tt.braceL);
@@ -983,55 +981,54 @@ export default class Tokenizer extends ParserErrors {
   }
 
   readRegexp(): void {
-    const start = this.state.pos;
+    const start = this.state.start + 1;
     let escaped, inClass;
-    for (;;) {
-      if (this.state.pos >= this.length) {
+    let { pos } = this.state;
+    for (; ; ++pos) {
+      if (pos >= this.length) {
         throw this.raise(start, Errors.UnterminatedRegExp);
       }
-      const ch = this.input.charAt(this.state.pos);
-      if (lineBreak.test(ch)) {
+      const ch = this.input.charCodeAt(pos);
+      if (isNewLine(ch)) {
         throw this.raise(start, Errors.UnterminatedRegExp);
       }
       if (escaped) {
         escaped = false;
       } else {
-        if (ch === "[") {
+        if (ch === charCodes.leftSquareBracket) {
           inClass = true;
-        } else if (ch === "]" && inClass) {
+        } else if (ch === charCodes.rightSquareBracket && inClass) {
           inClass = false;
-        } else if (ch === "/" && !inClass) {
+        } else if (ch === charCodes.slash && !inClass) {
           break;
         }
-        escaped = ch === "\\";
+        escaped = ch === charCodes.backslash;
       }
-      ++this.state.pos;
     }
-    const content = this.input.slice(start, this.state.pos);
-    ++this.state.pos;
+    const content = this.input.slice(start, pos);
+    ++pos;
 
     let mods = "";
 
-    while (this.state.pos < this.length) {
-      const char = this.input[this.state.pos];
-      const charCode = this.codePointAtPos(this.state.pos);
+    while (pos < this.length) {
+      const cp = this.codePointAtPos(pos);
+      // It doesn't matter if cp > 0xffff, the loop will either throw or break because we check on cp
+      const char = String.fromCharCode(cp);
 
-      if (VALID_REGEX_FLAGS.has(char)) {
-        if (mods.indexOf(char) > -1) {
-          this.raise(this.state.pos + 1, Errors.DuplicateRegExpFlags);
+      if (VALID_REGEX_FLAGS.has(cp)) {
+        if (mods.includes(char)) {
+          this.raise(pos + 1, Errors.DuplicateRegExpFlags);
         }
-      } else if (
-        isIdentifierChar(charCode) ||
-        charCode === charCodes.backslash
-      ) {
-        this.raise(this.state.pos + 1, Errors.MalformedRegExpFlags);
+      } else if (isIdentifierChar(cp) || cp === charCodes.backslash) {
+        this.raise(pos + 1, Errors.MalformedRegExpFlags);
       } else {
         break;
       }
 
-      ++this.state.pos;
+      ++pos;
       mods += char;
     }
+    this.state.pos = pos;
 
     this.finishToken(tt.regexp, {
       pattern: content,
@@ -1565,68 +1562,9 @@ export default class Tokenizer extends ParserErrors {
     }
   }
 
-  braceIsBlock(prevType: TokenType): boolean {
-    const parent = this.curContext();
-    if (parent === ct.functionExpression || parent === ct.functionStatement) {
-      return true;
-    }
-    if (
-      prevType === tt.colon &&
-      (parent === ct.braceStatement || parent === ct.braceExpression)
-    ) {
-      return !parent.isExpr;
-    }
-
-    // The check for `tt.name && exprAllowed` detects whether we are
-    // after a `yield` or `of` construct. See the `updateContext` for
-    // `tt.name`.
-    if (
-      prevType === tt._return ||
-      (prevType === tt.name && this.state.exprAllowed)
-    ) {
-      return this.hasPrecedingLineBreak();
-    }
-
-    if (
-      prevType === tt._else ||
-      prevType === tt.semi ||
-      prevType === tt.eof ||
-      prevType === tt.parenR ||
-      prevType === tt.arrow
-    ) {
-      return true;
-    }
-
-    if (prevType === tt.braceL) {
-      return parent === ct.braceStatement;
-    }
-
-    if (
-      prevType === tt._var ||
-      prevType === tt._const ||
-      prevType === tt.name
-    ) {
-      return false;
-    }
-
-    if (prevType === tt.relational) {
-      // `class C<T> { ... }`
-      return true;
-    }
-
-    return !this.state.exprAllowed;
-  }
-
+  // the prevType is required by the jsx plugin
+  // eslint-disable-next-line no-unused-vars
   updateContext(prevType: TokenType): void {
-    const type = this.state.type;
-    let update;
-
-    if (type.keyword && (prevType === tt.dot || prevType === tt.questionDot)) {
-      this.state.exprAllowed = false;
-    } else if ((update = type.updateContext)) {
-      update.call(this, prevType);
-    } else {
-      this.state.exprAllowed = type.beforeExpr;
-    }
+    this.state.type.updateContext?.(this.state.context);
   }
 }

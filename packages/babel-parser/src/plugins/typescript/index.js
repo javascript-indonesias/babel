@@ -283,6 +283,7 @@ export default (superClass: Class<Parser>): Class<Parser> =>
           } else {
             enforceOrder(startPos, modifier, modifier, "override");
             enforceOrder(startPos, modifier, modifier, "static");
+            enforceOrder(startPos, modifier, modifier, "readonly");
 
             modified.accessibility = modifier;
           }
@@ -1887,9 +1888,6 @@ export default (superClass: Class<Parser>): Class<Parser> =>
       if (node.params.length === 0) {
         this.raise(node.start, TSErrors.EmptyTypeArguments);
       }
-      // This reads the next token after the `>` too, so do this in the enclosing context.
-      // But be sure not to parse a regex in the jsx expression `<C<number> />`, so set exprAllowed = false
-      this.state.exprAllowed = false;
       this.expectRelational(">");
       return this.finishNode(node, "TSTypeParameterInstantiation");
     }
@@ -1930,10 +1928,23 @@ export default (superClass: Class<Parser>): Class<Parser> =>
 
       let accessibility: ?N.Accessibility;
       let readonly = false;
+      let override = false;
       if (allowModifiers !== undefined) {
-        accessibility = this.parseAccessModifier();
-        readonly = !!this.tsParseModifier(["readonly"]);
-        if (allowModifiers === false && (accessibility || readonly)) {
+        const modified = {};
+        this.tsParseModifiers(modified, [
+          "public",
+          "private",
+          "protected",
+          "override",
+          "readonly",
+        ]);
+        accessibility = modified.accessibility;
+        override = modified.override;
+        readonly = modified.readonly;
+        if (
+          allowModifiers === false &&
+          (accessibility || readonly || override)
+        ) {
           this.raise(startPos, TSErrors.UnexpectedParameterModifier);
         }
       }
@@ -1941,13 +1952,14 @@ export default (superClass: Class<Parser>): Class<Parser> =>
       const left = this.parseMaybeDefault();
       this.parseAssignableListItemTypes(left);
       const elt = this.parseMaybeDefault(left.start, left.loc.start, left);
-      if (accessibility || readonly) {
+      if (accessibility || readonly || override) {
         const pp: N.TSParameterProperty = this.startNodeAt(startPos, startLoc);
         if (decorators.length) {
           pp.decorators = decorators;
         }
         if (accessibility) pp.accessibility = accessibility;
         if (readonly) pp.readonly = readonly;
+        if (override) pp.override = override;
         if (elt.type !== "Identifier" && elt.type !== "AssignmentPattern") {
           this.raise(pp.start, TSErrors.UnsupportedParameterPropertyKind);
         }
@@ -2046,6 +2058,9 @@ export default (superClass: Class<Parser>): Class<Parser> =>
       state: N.ParseSubscriptState,
     ): N.Expression {
       if (!this.hasPrecedingLineBreak() && this.match(tt.bang)) {
+        // When ! is consumed as a postfix operator (non-null assertion),
+        // disallow JSX tag forming after. e.g. When parsing `p! < n.p!`
+        // `<n.p` can not be a start of JSX tag
         this.state.exprAllowed = false;
         this.next();
 
