@@ -221,8 +221,8 @@ __metadata:
     "@babel/helper-compilation-targets": "workspace:^7.14.5"
     "@babel/helper-module-transforms": "condition:BABEL_8_BREAKING ? : workspace:^7.14.5"
     "@babel/helper-transform-fixture-test-runner": "workspace:*"
-    "@babel/helpers": "workspace:^7.14.5"
-    "@babel/parser": "workspace:^7.14.5"
+    "@babel/helpers": "workspace:^7.14.6"
+    "@babel/parser": "workspace:^7.14.6"
     "@babel/plugin-transform-modules-commonjs": "workspace:*"
     "@babel/template": "workspace:^7.14.5"
     "@babel/traverse": "workspace:^7.14.5"
@@ -447,7 +447,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@babel/helper-create-class-features-plugin@workspace:^7.14.5, @babel/helper-create-class-features-plugin@workspace:packages/babel-helper-create-class-features-plugin":
+"@babel/helper-create-class-features-plugin@workspace:^7.14.5, @babel/helper-create-class-features-plugin@workspace:^7.14.6, @babel/helper-create-class-features-plugin@workspace:packages/babel-helper-create-class-features-plugin":
   version: 0.0.0-use.local
   resolution: "@babel/helper-create-class-features-plugin@workspace:packages/babel-helper-create-class-features-plugin"
   dependencies:
@@ -903,7 +903,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@babel/helpers@workspace:*, @babel/helpers@workspace:^7.14.5, @babel/helpers@workspace:packages/babel-helpers":
+"@babel/helpers@workspace:*, @babel/helpers@workspace:^7.14.6, @babel/helpers@workspace:packages/babel-helpers":
   version: 0.0.0-use.local
   resolution: "@babel/helpers@workspace:packages/babel-helpers"
   dependencies:
@@ -969,7 +969,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@babel/parser@workspace:*, @babel/parser@workspace:^7.14.5, @babel/parser@workspace:packages/babel-parser":
+"@babel/parser@workspace:*, @babel/parser@workspace:^7.14.5, @babel/parser@workspace:^7.14.6, @babel/parser@workspace:packages/babel-parser":
   version: 0.0.0-use.local
   resolution: "@babel/parser@workspace:packages/babel-parser"
   dependencies:
@@ -3034,7 +3034,7 @@ __metadata:
   resolution: "@babel/plugin-transform-typescript@workspace:packages/babel-plugin-transform-typescript"
   dependencies:
     "@babel/core": "workspace:*"
-    "@babel/helper-create-class-features-plugin": "workspace:^7.14.5"
+    "@babel/helper-create-class-features-plugin": "workspace:^7.14.6"
     "@babel/helper-plugin-test-runner": "workspace:*"
     "@babel/helper-plugin-utils": "workspace:^7.14.5"
     "@babel/plugin-syntax-typescript": "workspace:^7.14.5"
@@ -5773,7 +5773,7 @@ __metadata:
     lint-staged: ^9.2.0
     lodash: ^4.17.21
     mergeiterator: ^1.2.5
-    prettier: 2.3.0
+    prettier: 2.3.1
     rollup: ^2.47.0
     rollup-plugin-dts: ^2.0.0
     rollup-plugin-node-polyfills: ^0.2.1
@@ -12605,12 +12605,12 @@ fsevents@^1.2.7:
   languageName: node
   linkType: hard
 
-"prettier@npm:2.3.0":
-  version: 2.3.0
-  resolution: "prettier@npm:2.3.0"
+"prettier@npm:2.3.1":
+  version: 2.3.1
+  resolution: "prettier@npm:2.3.1"
   bin:
     prettier: bin-prettier.js
-  checksum: 652640cc8b71bc5277cfb8bf6f161783ca588efcf683c3d630837b39da8d57fef35c9e00ae5855a8e3c75136c42274046c913cc2b2d2968558315f31c6a26981
+  checksum: 9b4a695b87ce5f510fc20feec01cce7371f0fa0b92ffe79d543f6be52e2004c532861629de4d7ab1c577e1f649dce3cfccd62cb2ca6526b1da8d9c63eb84bf36
   languageName: node
   linkType: hard
 
